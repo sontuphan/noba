@@ -2,8 +2,8 @@
   "name": "tare",
   "version": "1.0.0",
   "description": "The platform-agnostic test framework",
-  "main": "dist/index.cjs",
-  "module": "dist/index.js",
+  "main": "dist/index.js",
+  "module": "dist/index.mjs",
   "source": "src/index.ts",
   "types": "dist/index.d.ts",
   "files": [
@@ -12,13 +12,14 @@
   "exports": {
     ".": {
       "types": "./dist/index.d.ts",
-      "import": "./dist/index.js",
-      "require": "./dist/index.cjs"
+      "import": "./dist/index.mjs",
+      "require": "./dist/index.js"
     }
   },
   "scripts": {
-    "build": "tsup src/index.ts --format cjs,esm --dts",
-    "test": ""
+    "build": "tsup src/index.ts --clean --format cjs,esm --dts",
+    "pretest": "npm run build && tsup tests/**/*.ts --clean --external tare --format cjs --out-dir tmp",
+    "test": "bare ./tmp/unit.test.js"
   },
   "keywords": [
     "test",
@@ -27,6 +28,7 @@
   "author": "Tu Phan <tu.phan@tether.io>",
   "license": "MIT",
   "devDependencies": {
+    "bare": "^1.22.0",
     "tsup": "^8.5.0",
     "typescript": "^5.9.2"
   }
