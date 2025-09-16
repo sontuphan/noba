@@ -19,7 +19,7 @@
   "scripts": {
     "build": "tsup src/index.ts --clean --format cjs,esm --dts",
     "pretest": "npm run build && tsup tests/**/*.ts --clean --external tare --format cjs --out-dir tmp",
-    "test": "bare ./tmp/unit.test.js"
+    "test": "node ./tmp/unit.test.js"
   },
   "keywords": [
     "test",
@@ -28,6 +28,7 @@
   "author": "Tu Phan <tu.phan@tether.io>",
   "license": "MIT",
   "devDependencies": {
+    "@types/node": "^24.5.0",
     "bare": "^1.22.0",
     "tsup": "^8.5.0",
     "typescript": "^5.9.2"
