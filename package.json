@@ -18,7 +18,7 @@
   },
   "scripts": {
     "build": "tsup src/index.ts --clean --format cjs,esm --dts",
-    "pretest": "npm run build && tsup tests/**/*.ts --clean --external tare --format cjs --out-dir tmp",
+    "pretest": "npm run build && tsup tests/**/*.ts --clean --silent --external tare --format cjs --out-dir tmp",
     "test": "node ./tmp/unit.test.js"
   },
   "keywords": [

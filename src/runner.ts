@@ -14,19 +14,32 @@ export type BaseCallbackParams = {
 
 export type CallbackParams = {
   describe: BaseCallbackParams &
-    Pick<InstanceType<typeof Runner>, 'describe' | 'test'>
+    Pick<
+      InstanceType<typeof Runner>,
+      | 'describe'
+      | 'test'
+      | 'beforeEach'
+      | 'afterEach'
+      | 'beforeAll'
+      | 'afterAll'
+    >
   test: BaseCallbackParams
 }
 
-export type JobType = keyof CallbackParams
+export type HookParams = {
+  beforeEach: BaseCallbackParams
+  afterEach: BaseCallbackParams
+  beforeAll: BaseCallbackParams
+  afterAll: BaseCallbackParams
+}
 
 export type Job = {
-  [K in JobType]: {
+  [K in keyof CallbackParams]: {
     type: K
     description: string
     cb: Func<CallbackParams[K], any>
   }
-}[JobType]
+}[keyof CallbackParams]
 
 export default class Runner {
   private readonly id: number
@@ -35,6 +48,12 @@ export default class Runner {
   private readonly logger: Logger
 
   private jobs: Array<Job> = []
+
+  private beforeAlls: Array<Func<HookParams['beforeAll'], any>> = []
+  private afterAlls: Array<Func<HookParams['afterAll'], any>> = []
+
+  private beforeEachs: Array<Func<HookParams['beforeEach'], any>> = []
+  private afterEachs: Array<Func<HookParams['afterEach'], any>> = []
 
   constructor({
     id = 0,
@@ -55,6 +74,8 @@ export default class Runner {
   }
 
   run = async () => {
+    await this.runBeforeAll()
+
     for (const { type, description, cb } of this.jobs) {
       if (type === 'describe') {
         this.logger.blue(description)
@@ -71,8 +92,11 @@ export default class Runner {
           log: runner.logger.log,
           describe: runner.describe,
           test: runner.test,
+          beforeEach: runner.beforeEach,
+          afterEach: runner.afterEach,
+          beforeAll: runner.beforeAll,
+          afterAll: runner.afterAll,
         })
-
         await runner.run()
 
         groupEnd()
@@ -83,7 +107,9 @@ export default class Runner {
         this.logger.green(description)
         const groupEnd = this.logger.group()
 
+        await this.runBeforeEach()
         await cb({ log: this.logger.log })
+        await this.runAfterEach()
 
         groupEnd()
         continue
@@ -91,9 +117,11 @@ export default class Runner {
 
       throw new Error('Invalid job.')
     }
+
+    await this.runAfterAll()
   }
 
-  describe = async <T>(
+  describe = <T>(
     description: string,
     cb: Func<CallbackParams['describe'], T> = () => {},
   ) => {
@@ -104,7 +132,7 @@ export default class Runner {
     })
   }
 
-  test = async <T>(
+  test = <T>(
     description: string,
     cb: Func<CallbackParams['test'], T> = () => {},
   ) => {
@@ -116,4 +144,42 @@ export default class Runner {
   }
 
   it = this.test
+
+  beforeAll = (cb?: Func<HookParams['beforeAll'], any>) => {
+    if (cb) this.beforeAlls.push(cb)
+  }
+  runBeforeAll = async () => {
+    for (const cb of this.beforeAlls) {
+      await cb({ log: this.logger.log })
+    }
+  }
+
+  afterAll = (cb?: Func<HookParams['afterAll'], any>) => {
+    if (cb) this.afterAlls.push(cb)
+  }
+  runAfterAll = async () => {
+    for (const cb of this.afterAlls) {
+      await cb({ log: this.logger.log })
+    }
+  }
+
+  beforeEach = (cb?: Func<HookParams['beforeEach'], any>) => {
+    if (cb) this.beforeEachs.push(cb)
+  }
+  runBeforeEach = async () => {
+    await this.parent?.runBeforeEach()
+    for (const cb of this.beforeEachs) {
+      await cb({ log: this.logger.log })
+    }
+  }
+
+  afterEach = (cb?: Func<HookParams['afterEach'], any>) => {
+    if (cb) this.afterEachs.push(cb)
+  }
+  runAfterEach = async () => {
+    await this.parent?.runAfterEach()
+    for (const cb of this.afterEachs) {
+      await cb({ log: this.logger.log })
+    }
+  }
 }
