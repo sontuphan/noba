@@ -1,11 +1,19 @@
 import { colors, uuid } from './utils'
 
-export default class Logger {
+export default class Reporter {
   private groupIds: number[] = []
+  private errors: any[] = []
+
   constructor(private readonly spaces = 2) {}
 
   get spacer() {
     return ' '.repeat(this.spaces).repeat(this.groupIds.length)
+  }
+
+  report = () => {
+    for (const er of this.errors) {
+      console.trace(er)
+    }
   }
 
   group = () => {
@@ -21,6 +29,10 @@ export default class Logger {
 
   log = (msg: any = '', ...args: any[]) => {
     console.log(`${this.spacer}${msg}`, ...args)
+  }
+
+  catch = (er: any) => {
+    this.errors.push(er)
   }
 
   red = (msg: any = '', ...args: any[]) => {
