@@ -1,4 +1,4 @@
-import { uuid } from './utils'
+import { colors, uuid } from './utils'
 
 export default class Logger {
   private groupIds: number[] = []
@@ -24,18 +24,18 @@ export default class Logger {
   }
 
   red = (msg: any = '', ...args: any[]) => {
-    this.log(`\x1b[31m${msg}`, ...args, '\x1b[0m')
+    this.log(`${colors.red}${msg}`, ...args, colors.none)
   }
 
   green = (msg: any = '', ...args: any[]) => {
-    this.log(`\x1b[32m${msg}`, ...args, '\x1b[0m')
+    this.log(`${colors.green}${msg}`, ...args, colors.none)
   }
 
   yellow = (msg: any = '', ...args: any[]) => {
-    this.log(`\x1b[33m${msg}`, ...args, '\x1b[0m')
+    this.log(`${colors.yellow}${msg}`, ...args, colors.none)
   }
 
   blue = (msg: any = '', ...args: any[]) => {
-    this.log(`\x1b[34m${msg}`, ...args, '\x1b[0m')
+    this.log(`${colors.blue}${msg}`, ...args, colors.none)
   }
 }

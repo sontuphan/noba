@@ -1,4 +1,4 @@
-import { describe, delay } from 'tare'
+import { describe, delay, expect } from 'tare'
 
 describe('unit test', async ({
   describe,
@@ -24,20 +24,20 @@ describe('unit test', async ({
     log('after each')
   })
 
-  test('should successfully return true #1', async ({ log, is }) => {
+  test('should successfully return true #1', async ({ log }) => {
     log('test #1.1')
-    is(1, 1)
+    expect(1).toBe(1)
   })
-  test('should successfully return true #2', async ({ log, is }) => {
+  test('should successfully return true #2', async ({ log }) => {
     log('test #2.1')
-    is(false, false)
+    expect(false).toBe(false)
   })
 
   describe('nested unit test', ({ test }) => {
-    test('should successfully return true #3', async ({ log, is }) => {
+    test('should successfully return true #3', async ({ log }) => {
       log('test #3.1')
       log('test #3.2')
-      is('a', 'b')
+      expect('a').toBe('b')
     })
   })
 })
