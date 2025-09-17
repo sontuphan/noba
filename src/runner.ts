@@ -65,7 +65,7 @@ export default class Runner {
 
   constructor({
     id = 0,
-    timeout = 10000,
+    timeout = 5000,
     parent = null,
     logger = new Logger(),
     reporter = new Reporter(),
@@ -114,7 +114,7 @@ export default class Runner {
     })
   }
 
-  runDescribe = async <T>(
+  private runDescribe = async <T>(
     description: string,
     cb: Func<CallbackParams['describe'], T> = () => {},
   ) => {
@@ -158,7 +158,7 @@ export default class Runner {
     })
   }
 
-  runTest = async <T>(
+  private runTest = async <T>(
     description: string,
     cb: Func<CallbackParams['test'], T> = () => {},
   ) => {
@@ -166,6 +166,7 @@ export default class Runner {
 
     const groupEnd = this.logger.group()
     const timerEnd = timer()
+
     try {
       const expect = <T>(value: T) => new Expect(value, this.logger)
       await cb({ log: this.logger.log, expect })
@@ -199,7 +200,7 @@ export default class Runner {
     if (cb) this.beforeAlls.push(cb)
   }
 
-  runBeforeAll = async () => {
+  private runBeforeAll = async () => {
     for (const cb of this.beforeAlls) {
       await cb({ log: this.logger.log })
     }
@@ -213,7 +214,7 @@ export default class Runner {
     if (cb) this.afterAlls.push(cb)
   }
 
-  runAfterAll = async () => {
+  private runAfterAll = async () => {
     for (const cb of this.afterAlls) {
       await cb({ log: this.logger.log })
     }

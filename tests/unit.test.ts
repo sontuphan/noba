@@ -53,7 +53,8 @@ describe('unit test', async ({
 
 describe('type test', ({ describe }) => {
   describe('nested type test', async ({ test }) => {
-    test('should sucessfully return true', ({ expect }) => {
+    test('should sucessfully return true', async ({ expect }) => {
+      await delay(10000)
       expect({ a: 1 }).toBe({ a: 1 })
     })
   })
