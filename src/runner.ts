@@ -2,6 +2,7 @@ import Expect from './expect'
 import Logger from './info/logger'
 import Reporter from './info/reporter'
 import type { Func } from './types'
+import { timer } from './utils'
 
 export type RunnerConfig = {
   id?: number
@@ -50,6 +51,7 @@ export default class Runner {
   private readonly id: number
   private readonly timeout: number
   private readonly parent: Runner | null
+
   private readonly logger: Logger
   private readonly reporter: Reporter
 
@@ -77,8 +79,9 @@ export default class Runner {
 
     if (!this.id) {
       process.nextTick(async () => {
+        // Run the tree of tests
         await this.run()
-        // Show report
+        // Show the report
         return this.reporter.report()
       })
     }
@@ -88,58 +91,17 @@ export default class Runner {
     await this.runBeforeAll()
 
     for (const { type, description, cb } of this.jobs) {
-      if (type === 'describe') {
-        this.logger.blue(description)
-        const groupEnd = this.logger.group()
-
-        const runner = new Runner({
-          id: this.id + 1,
-          timeout: this.timeout,
-          parent: this,
-          logger: this.logger,
-          reporter: this.reporter,
-        })
-
-        await cb({
-          log: runner.logger.log,
-          describe: runner.describe,
-          test: runner.test,
-          beforeEach: runner.beforeEach,
-          afterEach: runner.afterEach,
-          beforeAll: runner.beforeAll,
-          afterAll: runner.afterAll,
-        })
-        await runner.run()
-
-        groupEnd()
-        continue
-      }
-
-      if (type === 'test') {
-        await this.runBeforeEach()
-
-        const groupEnd = this.logger.group()
-        try {
-          const expect = <T>(value: T) => new Expect(value, this.logger)
-          await cb({ log: this.logger.log, expect })
-          groupEnd()
-
-          this.logger.green(description)
-          this.reporter.pass()
-        } catch (er) {
-          groupEnd()
-
-          this.logger.red(description)
-          this.reporter.catch(description, er)
-        }
-
-        await this.runAfterEach()
-        continue
-      }
+      if (type === 'describe') await this.runDescribe(description, cb)
+      else if (type === 'test') await this.runTest(description, cb)
+      else throw new Error('Invalid job.')
     }
 
     await this.runAfterAll()
   }
+
+  /**
+   * Describe block
+   */
 
   describe = <T>(
     description: string,
@@ -152,6 +114,39 @@ export default class Runner {
     })
   }
 
+  runDescribe = async <T>(
+    description: string,
+    cb: Func<CallbackParams['describe'], T> = () => {},
+  ) => {
+    this.logger.blue(description)
+    const groupEnd = this.logger.group()
+
+    const runner = new Runner({
+      id: this.id + 1,
+      timeout: this.timeout,
+      parent: this,
+      logger: this.logger,
+      reporter: this.reporter,
+    })
+
+    await cb({
+      log: runner.logger.log,
+      describe: runner.describe,
+      test: runner.test,
+      beforeEach: runner.beforeEach,
+      afterEach: runner.afterEach,
+      beforeAll: runner.beforeAll,
+      afterAll: runner.afterAll,
+    })
+    await runner.run()
+
+    groupEnd()
+  }
+
+  /**
+   * Test block
+   */
+
   test = <T>(
     description: string,
     cb: Func<CallbackParams['test'], T> = () => {},
@@ -163,29 +158,75 @@ export default class Runner {
     })
   }
 
+  runTest = async <T>(
+    description: string,
+    cb: Func<CallbackParams['test'], T> = () => {},
+  ) => {
+    await this.runBeforeEach()
+
+    const groupEnd = this.logger.group()
+    const timerEnd = timer()
+    try {
+      const expect = <T>(value: T) => new Expect(value, this.logger)
+      await cb({ log: this.logger.log, expect })
+
+      groupEnd()
+      const ms = timerEnd()
+
+      this.logger.green(description, ms)
+      this.reporter.pass()
+    } catch (er) {
+      groupEnd()
+
+      this.logger.red(description)
+      this.reporter.catch(description, er)
+    }
+
+    await this.runAfterEach()
+  }
+
+  /**
+   * It block (test alias)
+   */
+
   it = this.test
+
+  /**
+   * Before all
+   */
 
   beforeAll = (cb?: Func<HookParams['beforeAll'], any>) => {
     if (cb) this.beforeAlls.push(cb)
   }
+
   runBeforeAll = async () => {
     for (const cb of this.beforeAlls) {
       await cb({ log: this.logger.log })
     }
   }
 
+  /**
+   * After all
+   */
+
   afterAll = (cb?: Func<HookParams['afterAll'], any>) => {
     if (cb) this.afterAlls.push(cb)
   }
+
   runAfterAll = async () => {
     for (const cb of this.afterAlls) {
       await cb({ log: this.logger.log })
     }
   }
 
+  /**
+   * Before each
+   */
+
   beforeEach = (cb?: Func<HookParams['beforeEach'], any>) => {
     if (cb) this.beforeEachs.push(cb)
   }
+
   runBeforeEach = async () => {
     await this.parent?.runBeforeEach()
     for (const cb of this.beforeEachs) {
@@ -193,9 +234,14 @@ export default class Runner {
     }
   }
 
+  /**
+   * After each
+   */
+
   afterEach = (cb?: Func<HookParams['afterEach'], any>) => {
     if (cb) this.afterEachs.push(cb)
   }
+
   runAfterEach = async () => {
     await this.parent?.runAfterEach()
     for (const cb of this.afterEachs) {

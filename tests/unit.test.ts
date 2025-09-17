@@ -26,10 +26,21 @@ describe('unit test', async ({
 
   test('should successfully return true #1', async ({ log, expect }) => {
     log('test #1')
+    await delay(100)
     expect(1).toBe(1)
   })
+
   test('should successfully return true #2', async ({ log, expect }) => {
     log('test #2')
+    await delay(300)
+    const a = { a: 1 }
+    const b = a
+    expect(a).toBe(b)
+  })
+
+  test('should successfully return true #3', async ({ log, expect }) => {
+    log('test #3')
+    await delay(1000)
     expect(false).toBe(false)
   })
 

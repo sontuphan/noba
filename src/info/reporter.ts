@@ -19,7 +19,7 @@ export default class Reporter {
     for (const [description, er] of this.errors) {
       console.log(`\n${colors.red}%s${colors.none}`, description)
       if ('stack' in er) console.error(er.stack)
-      else console.error(er)
+      else console.trace(er)
     }
 
     const fail = this.fail

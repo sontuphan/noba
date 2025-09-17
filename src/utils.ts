@@ -13,3 +13,13 @@ export const colors = {
   yellow: '\x1b[33m',
   blue: '\x1b[34m',
 }
+
+export const timer = () => {
+  const start = Date.now()
+  return () => {
+    const end = Date.now() - start
+    if (end < 300) return `${colors.green}(${end}ms)${colors.none}`
+    else if (end < 1000) return `${colors.yellow}(${end}ms)${colors.none}`
+    else return `${colors.red}(${end}ms)${colors.none}`
+  }
+}
