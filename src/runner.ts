@@ -1,15 +1,18 @@
-import Reporter from './reporter'
+import Expect from './expect'
+import Logger from './info/logger'
+import Reporter from './info/reporter'
 import type { Func } from './types'
 
 export type RunnerConfig = {
   id?: number
   timeout?: number // ms
   parent?: Runner | null
+  logger?: Logger
   reporter?: Reporter
 }
 
 export type BaseCallbackParams = {
-  log: InstanceType<typeof Reporter>['log']
+  log: InstanceType<typeof Logger>['log']
 }
 
 export type CallbackParams = {
@@ -23,7 +26,9 @@ export type CallbackParams = {
       | 'beforeAll'
       | 'afterAll'
     >
-  test: BaseCallbackParams
+  test: BaseCallbackParams & {
+    expect: <T>(value: T) => InstanceType<typeof Expect<T>>
+  }
 }
 
 export type HookParams = {
@@ -45,6 +50,7 @@ export default class Runner {
   private readonly id: number
   private readonly timeout: number
   private readonly parent: Runner | null
+  private readonly logger: Logger
   private readonly reporter: Reporter
 
   private jobs: Array<Job> = []
@@ -59,11 +65,14 @@ export default class Runner {
     id = 0,
     timeout = 10000,
     parent = null,
+    logger = new Logger(),
     reporter = new Reporter(),
   }: RunnerConfig = {}) {
     this.id = id
     this.timeout = timeout
     this.parent = parent
+
+    this.logger = logger
     this.reporter = reporter
 
     if (!this.id) {
@@ -80,18 +89,19 @@ export default class Runner {
 
     for (const { type, description, cb } of this.jobs) {
       if (type === 'describe') {
-        this.reporter.blue(description)
-        const groupEnd = this.reporter.group()
+        this.logger.blue(description)
+        const groupEnd = this.logger.group()
 
         const runner = new Runner({
           id: this.id + 1,
           timeout: this.timeout,
           parent: this,
+          logger: this.logger,
           reporter: this.reporter,
         })
 
         await cb({
-          log: runner.reporter.log,
+          log: runner.logger.log,
           describe: runner.describe,
           test: runner.test,
           beforeEach: runner.beforeEach,
@@ -108,15 +118,19 @@ export default class Runner {
       if (type === 'test') {
         await this.runBeforeEach()
 
-        const groupEnd = this.reporter.group()
+        const groupEnd = this.logger.group()
         try {
-          await cb({ log: this.reporter.log })
+          const expect = <T>(value: T) => new Expect(value, this.logger)
+          await cb({ log: this.logger.log, expect })
           groupEnd()
-          this.reporter.green(description)
+
+          this.logger.green(description)
+          this.reporter.pass()
         } catch (er) {
           groupEnd()
-          this.reporter.red(description)
-          this.reporter.catch(er)
+
+          this.logger.red(description)
+          this.reporter.catch(description, er)
         }
 
         await this.runAfterEach()
@@ -156,7 +170,7 @@ export default class Runner {
   }
   runBeforeAll = async () => {
     for (const cb of this.beforeAlls) {
-      await cb({ log: this.reporter.log })
+      await cb({ log: this.logger.log })
     }
   }
 
@@ -165,7 +179,7 @@ export default class Runner {
   }
   runAfterAll = async () => {
     for (const cb of this.afterAlls) {
-      await cb({ log: this.reporter.log })
+      await cb({ log: this.logger.log })
     }
   }
 
@@ -175,7 +189,7 @@ export default class Runner {
   runBeforeEach = async () => {
     await this.parent?.runBeforeEach()
     for (const cb of this.beforeEachs) {
-      await cb({ log: this.reporter.log })
+      await cb({ log: this.logger.log })
     }
   }
 
@@ -185,7 +199,7 @@ export default class Runner {
   runAfterEach = async () => {
     await this.parent?.runAfterEach()
     for (const cb of this.afterEachs) {
-      await cb({ log: this.reporter.log })
+      await cb({ log: this.logger.log })
     }
   }
 }
