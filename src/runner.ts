@@ -1,3 +1,4 @@
+import Asserter from './asserter'
 import Logger from './logger'
 import type { Func } from './types'
 
@@ -23,7 +24,7 @@ export type CallbackParams = {
       | 'beforeAll'
       | 'afterAll'
     >
-  test: BaseCallbackParams
+  test: BaseCallbackParams & Pick<InstanceType<typeof Runner>, 'is'>
 }
 
 export type HookParams = {
@@ -41,11 +42,10 @@ export type Job = {
   }
 }[keyof CallbackParams]
 
-export default class Runner {
+export default class Runner extends Asserter {
   private readonly id: number
   private readonly timeout: number
   private readonly parent: Runner | null
-  private readonly logger: Logger
 
   private jobs: Array<Job> = []
 
@@ -61,10 +61,11 @@ export default class Runner {
     parent = null,
     logger = new Logger(),
   }: RunnerConfig = {}) {
+    super(logger)
+
     this.id = id
     this.timeout = timeout
     this.parent = parent
-    this.logger = logger
 
     if (!this.id) {
       process.nextTick(() => {
@@ -108,7 +109,7 @@ export default class Runner {
         const groupEnd = this.logger.group()
 
         await this.runBeforeEach()
-        await cb({ log: this.logger.log })
+        await cb({ log: this.logger.log, is: this.is })
         await this.runAfterEach()
 
         groupEnd()
