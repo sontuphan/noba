@@ -20,8 +20,8 @@ export default class Logger {
     }
   }
 
-  log = (msg: any = '', ...args: any[]) => {
-    console.log(`${this.spacer}${msg}`, ...args)
+  log = (_msg: any = '', ..._args: any[]): void => {
+    throw new Error('The function is not implemented')
   }
 
   red = (msg: any = '', ...args: any[]) => {

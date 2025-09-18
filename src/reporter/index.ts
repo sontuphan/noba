@@ -11,8 +11,25 @@ export default class Reporter extends Logger {
     super(spaces)
   }
 
-  emit = (type: 'json' | 'raw', ...args: any) => {
-    console.log(this.mainId, type, ...args)
+  get tag() {
+    return {
+      json: `${this.mainId} json ${this.mainId}`,
+      error: `${this.mainId} error ${this.mainId}`,
+      log: `${this.mainId} log ${this.mainId}`,
+      end: this.mainId,
+    }
+  }
+
+  error = (...ers: any[]) => {
+    console.error(this.tag.error, ...ers, this.tag.end)
+  }
+
+  json = (data: string) => {
+    console.log(this.tag.json, data, this.tag.end)
+  }
+
+  override log = (msg: any = '', ...args: any[]): void => {
+    console.log(this.tag.log, `${this.spacer}${msg}`, ...args, this.tag.end)
   }
 
   pass = () => {
@@ -26,8 +43,8 @@ export default class Reporter extends Logger {
 
   report = () => {
     for (const [description, er] of this.errors) {
-      this.emit('raw', `\n${colors.red}${description}${colors.none}`)
-      this.emit('raw', er.stack ? er.stack : er)
+      this.error(`\n${colors.red}${description}${colors.none}`)
+      this.error(er.stack ? er.stack : er)
     }
 
     const data = {
@@ -35,7 +52,7 @@ export default class Reporter extends Logger {
       fail: this.fail,
       success: this.success,
     }
-    this.emit('json', JSON.stringify(data))
+    this.json(JSON.stringify(data))
 
     return data
   }

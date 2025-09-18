@@ -34,24 +34,6 @@ const {
 } = cmd
 const files = cmd.rest
 
-// const { spawnSync } = require('child_process')
-// for (const file of files) {
-//   const TARE_MAIN_ID = Math.round(Math.random() * 10 ** 12).toString()
-
-//   console.log(`\n${yellow(file)}`)
-//   const { status } = spawnSync('node', [file], {
-//     stdio: 'inherit',
-//     shell: true,
-//     env: {
-//       ...process.env,
-//       TARE_TIMEOUT,
-//       TARE_MAIN_ID,
-//     },
-//   })
-
-//   console.log(status)
-// }
-
 const spawnSync = (file) => {
   const TARE_MAIN_ID = Math.round(Math.random() * 10 ** 12).toString()
 
@@ -64,14 +46,24 @@ const spawnSync = (file) => {
     },
   }
 
-  const filter = (log, out) => {
-    log = log.endsWith('\n') ? log.slice(0, -1) : log
-    if (!log.startsWith(TARE_MAIN_ID)) return out(log)
-    const [, type, ...msg] = log.split(' ')
-    const data = msg.join(' ')
+  const softTrim = (str) => str.slice(1, -1)
 
-    if (type === 'raw') result.errors.push(data)
-    if (type === 'json') result.summary = JSON.parse(data)
+  const filter = (msg, out) => {
+    if (!msg.startsWith(TARE_MAIN_ID)) return out(msg)
+
+    msg
+      .split(TARE_MAIN_ID)
+      .map((e) => softTrim(e))
+      .filter((e) => !!e)
+      .reduce((e, _, i, a) => {
+        if (i % 2 === 0) e.push(a.slice(i, i + 2))
+        return e
+      }, [])
+      .forEach(([type, data]) => {
+        if (type === 'error') result.errors.push(data)
+        if (type === 'json') result.summary = JSON.parse(data)
+        if (type === 'log') out(data)
+      })
   }
 
   return new Promise((resolve, reject) => {
@@ -88,8 +80,8 @@ const spawnSync = (file) => {
     child.stdout.setEncoding('utf8')
     child.stderr.setEncoding('utf8')
 
-    child.stdout.on('data', (log) => filter(log, console.log))
-    child.stderr.on('data', (log) => filter(log, console.error))
+    child.stdout.on('data', (log) => filter(log.trim(), console.log))
+    child.stderr.on('data', (log) => filter(log.trim(), console.error))
 
     child.on('close', (code) => {
       if (!code) return resolve(result)

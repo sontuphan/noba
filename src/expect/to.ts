@@ -26,7 +26,7 @@ export default class To<T> {
     this.reporter.green('- Expect:', this.expect)
     this.reporter.red('- Actual:', actual)
     throw new Error(
-      `Expect ${this.expect} ${this.infinitive} equals to ${actual}`,
+      `Expect ${this.expect} ${this.infinitive} equal to ${actual}`,
     )
   }
 }
