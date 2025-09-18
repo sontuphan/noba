@@ -3,12 +3,25 @@
   "version": "1.0.0",
   "description": "The test framework for Bare",
   "main": "dist/index.js",
+  "bin": {
+    "tare-bare": "bin/bare.js"
+  },
   "module": "dist/index.mjs",
   "source": "src/index.ts",
   "types": "dist/index.d.ts",
   "files": [
     "dist/**"
   ],
+  "imports": {
+    "process": {
+      "bare": "bare-process",
+      "default": "process"
+    },
+    "child_process": {
+      "bare": "bare-subprocess",
+      "default": "child_process"
+    }
+  },
   "exports": {
     ".": {
       "types": "./dist/index.d.ts",
@@ -19,7 +32,7 @@
   "scripts": {
     "build": "tsup src/index.ts --clean --format cjs,esm --dts --sourcemap",
     "pretest": "npm run build && tsup tests/**/*.ts --clean --silent --external tare --format cjs --out-dir tmp",
-    "test": "node ./tmp/equal.test.js"
+    "test": "bare ./tmp/ok.test.js"
   },
   "keywords": [
     "test",
@@ -32,5 +45,10 @@
     "bare": "^1.22.0",
     "tsup": "^8.5.0",
     "typescript": "^5.9.2"
+  },
+  "dependencies": {
+    "bare-process": "^4.2.1",
+    "bare-subprocess": "^5.1.2",
+    "paparam": "^1.8.6"
   }
 }

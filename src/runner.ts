@@ -1,17 +1,10 @@
+import process from 'process'
 import Assert from './assert'
 import Expect from './expect'
-import Logger from './info/logger'
-import Reporter from './info/reporter'
+import Logger from './reporter'
+import Reporter from './reporter'
 import type { Func } from './types/generic'
-import { race, timer } from './utils'
-
-export type RunnerConfig = {
-  id?: number
-  timeout?: number // ms
-  parent?: Runner | null
-  logger?: Logger
-  reporter?: Reporter
-}
+import { race, timer, uuid } from './utils'
 
 export type BaseCallbackParams = {
   log: InstanceType<typeof Logger>['log']
@@ -51,11 +44,6 @@ export type Job = {
 }[keyof CallbackParams]
 
 export default class Runner {
-  private readonly id: number
-  private readonly timeout: number
-  private readonly parent: Runner | null
-
-  private readonly logger: Logger
   private readonly reporter: Reporter
 
   private jobs: Array<Job> = []
@@ -66,22 +54,17 @@ export default class Runner {
   private beforeEachs: Array<Func<HookParams['beforeEach'], any>> = []
   private afterEachs: Array<Func<HookParams['afterEach'], any>> = []
 
-  constructor({
-    id = 0,
-    timeout = 5000,
-    parent = null,
-    logger = new Logger(),
-    reporter = new Reporter(),
-  }: RunnerConfig = {}) {
-    this.id = id
-    this.timeout = timeout
-    this.parent = parent
+  constructor(
+    private readonly id: string,
+    private readonly timeout: number = 5000,
+    private readonly parent: Runner | null = null,
+    reporter?: Reporter,
+  ) {
+    // This instance is created once in main and passed around
+    this.reporter = reporter || new Reporter(this.id)
 
-    this.logger = logger
-    this.reporter = reporter
-
-    if (!this.id) {
-      queueMicrotask(async () => {
+    if (this.isMain) {
+      process.nextTick(async () => {
         // Setup
         const handleUncaughtException = (er: any) => {
           this.reporter.catch('Uncaught Exception', er)
@@ -89,13 +72,17 @@ export default class Runner {
         process.on('uncaughtException', handleUncaughtException)
         // Run the tree of tests
         await this.run()
-        // Show the report
-        const { fail } = this.reporter.report()
+        // Emit the report
+        this.reporter.report()
         // Teardown
         process.off('uncaughtException', handleUncaughtException)
-        return process.exit(!fail ? 0 : 1)
+        return process.exit(0)
       })
     }
+  }
+
+  get isMain() {
+    return this.id === process.env.TARE_MAIN_ID
   }
 
   run = async () => {
@@ -129,19 +116,13 @@ export default class Runner {
     description: string,
     cb: Func<CallbackParams['describe'], T> = () => {},
   ) => {
-    this.logger.blue(description)
-    const groupEnd = this.logger.group()
+    this.reporter.blue(description)
+    const groupEnd = this.reporter.group()
 
-    const runner = new Runner({
-      id: this.id + 1,
-      timeout: this.timeout,
-      parent: this,
-      logger: this.logger,
-      reporter: this.reporter,
-    })
+    const runner = new Runner(uuid(), this.timeout, this, this.reporter)
 
     await cb({
-      log: runner.logger.log,
+      log: runner.reporter.log,
       describe: runner.describe,
       test: runner.test,
       it: runner.it,
@@ -176,15 +157,15 @@ export default class Runner {
   ) => {
     await this.runBeforeEach()
 
-    const groupEnd = this.logger.group()
+    const groupEnd = this.reporter.group()
     const timerEnd = timer()
 
     try {
-      const expect = <T>(value: T) => new Expect(value, this.logger)
-      const assert = new Assert(this.logger)
+      const expect = <T>(value: T) => new Expect(value, this.reporter)
+      const assert = new Assert(this.reporter)
 
       await race(
-        async () => await cb({ log: this.logger.log, expect, assert }),
+        async () => await cb({ log: this.reporter.log, expect, assert }),
         this.timeout,
         `Cannot complete the task in ${this.timeout}ms.`,
       )
@@ -192,12 +173,12 @@ export default class Runner {
       groupEnd()
       const { message } = timerEnd()
 
-      this.logger.green(description, message)
+      this.reporter.green(description, message)
       this.reporter.pass()
     } catch (er) {
       groupEnd()
 
-      this.logger.red(description)
+      this.reporter.red(description)
       this.reporter.catch(description, er)
     }
 
@@ -220,7 +201,7 @@ export default class Runner {
 
   private runBeforeAll = async () => {
     for (const cb of this.beforeAlls) {
-      await cb({ log: this.logger.log })
+      await cb({ log: this.reporter.log })
     }
   }
 
@@ -234,7 +215,7 @@ export default class Runner {
 
   private runAfterAll = async () => {
     for (const cb of this.afterAlls) {
-      await cb({ log: this.logger.log })
+      await cb({ log: this.reporter.log })
     }
   }
 
@@ -249,7 +230,7 @@ export default class Runner {
   runBeforeEach = async () => {
     await this.parent?.runBeforeEach()
     for (const cb of this.beforeEachs) {
-      await cb({ log: this.logger.log })
+      await cb({ log: this.reporter.log })
     }
   }
 
@@ -264,7 +245,7 @@ export default class Runner {
   runAfterEach = async () => {
     await this.parent?.runAfterEach()
     for (const cb of this.afterEachs) {
-      await cb({ log: this.logger.log })
+      await cb({ log: this.reporter.log })
     }
   }
 }

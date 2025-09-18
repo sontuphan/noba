@@ -1,15 +1,15 @@
-import Logger from 'src/info/logger'
+import Reporter from '../reporter'
 
 export default class Assert {
-  constructor(private readonly logger: Logger = new Logger()) {}
+  constructor(private readonly reporter: Reporter) {}
 
   get assert() {
-    return new Assert(this.logger)
+    return new Assert(this.reporter)
   }
 
   private expect = <A, E>(actual: A, verb: string, expect: E) => {
-    this.logger.green('- Expected:', expect)
-    this.logger.red('- Received:', actual)
+    this.reporter.green('- Expected:', expect)
+    this.reporter.red('- Received:', actual)
 
     return `Expect ${actual} ${verb} ${expect}.`
   }

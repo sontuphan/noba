@@ -1,7 +1,7 @@
 import { colors, uuid } from '../utils'
 
 export default class Logger {
-  private groupIds: number[] = []
+  private groupIds: string[] = []
 
   constructor(private readonly spaces = 2) {}
 

@@ -1,10 +1,10 @@
-import Logger from '../info/logger'
+import Reporter from '../reporter'
 import Be from './be'
 
 export default class To<T> {
   constructor(
     public readonly expect: T,
-    private readonly logger: Logger = new Logger(),
+    private readonly reporter: Reporter,
     private readonly not = false,
   ) {}
 
@@ -13,7 +13,7 @@ export default class To<T> {
   }
 
   get be() {
-    return new Be(this.not)
+    return new Be(this.not, this.reporter)
   }
 
   private compare = (value: boolean) => {
@@ -23,8 +23,8 @@ export default class To<T> {
   equal = (actual: T) => {
     if (this.compare(this.expect == actual)) return
 
-    this.logger.green('- Expect:', this.expect)
-    this.logger.red('- Actual:', actual)
+    this.reporter.green('- Expect:', this.expect)
+    this.reporter.red('- Actual:', actual)
     throw new Error(
       `Expect ${this.expect} ${this.infinitive} equals to ${actual}`,
     )

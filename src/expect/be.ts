@@ -1,9 +1,9 @@
-import Logger from '../info/logger'
+import Reporter from '../reporter'
 
 export default class Be<T> {
   constructor(
     public readonly expect: T,
-    private readonly logger: Logger = new Logger(),
+    private readonly reporter: Reporter,
     private readonly not = false,
   ) {}
 
