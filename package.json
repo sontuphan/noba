@@ -1,7 +1,7 @@
 {
   "name": "tare",
   "version": "1.0.0",
-  "description": "The platform-agnostic test framework",
+  "description": "The test framework for Bare",
   "main": "dist/index.js",
   "module": "dist/index.mjs",
   "source": "src/index.ts",

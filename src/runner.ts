@@ -2,7 +2,7 @@ import Expect from './expect'
 import Logger from './info/logger'
 import Reporter from './info/reporter'
 import type { Func } from './types'
-import { timer } from './utils'
+import { race, timer } from './utils'
 
 export type RunnerConfig = {
   id?: number
@@ -78,11 +78,19 @@ export default class Runner {
     this.reporter = reporter
 
     if (!this.id) {
-      process.nextTick(async () => {
+      queueMicrotask(async () => {
+        // Setup
+        const handleUncaughtException = (er: any) => {
+          this.reporter.catch('Uncaught Exception', er)
+        }
+        process.on('uncaughtException', handleUncaughtException)
         // Run the tree of tests
         await this.run()
         // Show the report
-        return this.reporter.report()
+        const { fail } = this.reporter.report()
+        // Teardown
+        process.off('uncaughtException', handleUncaughtException)
+        return process.exit(!fail ? 0 : 1)
       })
     }
   }
@@ -169,7 +177,12 @@ export default class Runner {
 
     try {
       const expect = <T>(value: T) => new Expect(value, this.logger)
-      await cb({ log: this.logger.log, expect })
+
+      await race(
+        async () => await cb({ log: this.logger.log, expect }),
+        this.timeout,
+        `Cannot complete the task in ${this.timeout}ms.`,
+      )
 
       groupEnd()
       const ms = timerEnd()

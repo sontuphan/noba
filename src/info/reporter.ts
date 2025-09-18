@@ -18,8 +18,7 @@ export default class Reporter {
   report = () => {
     for (const [description, er] of this.errors) {
       console.log(`\n${colors.red}%s${colors.none}`, description)
-      if ('stack' in er) console.error(er.stack)
-      else console.trace(er)
+      console.trace(er)
     }
 
     const fail = this.fail
@@ -34,5 +33,7 @@ export default class Reporter {
       },`,
       `${colors.red}${fail} fail${fail > 1 ? 's' : ''}${colors.none}`,
     )
+
+    return { total, fail, success }
   }
 }

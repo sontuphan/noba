@@ -1,7 +1,5 @@
 import Runner from './runner'
 
-const runner = new Runner()
-
-export const { describe, test } = runner
+export const { describe, test } = new Runner()
 
 export * from './utils'

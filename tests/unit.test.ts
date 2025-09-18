@@ -45,7 +45,7 @@ describe('unit test', async ({
   })
 
   describe('nested unit test', ({ test }) => {
-    test('should successfully return true #3', async ({ expect }) => {
+    test('should successfully return false', async ({ expect }) => {
       expect('a').toBe('b')
     })
   })
@@ -53,7 +53,21 @@ describe('unit test', async ({
 
 describe('type test', ({ describe }) => {
   describe('nested type test', async ({ test }) => {
-    test('should sucessfully return true', async ({ expect }) => {
+    test('should catch this exception', async () => {
+      setTimeout(() => {
+        throw new Error('an uncaught error')
+      }, 1000)
+    })
+
+    test('should keep counting', async ({ expect, log }) => {
+      for (let i = 0; i < 10; i++) {
+        await delay(1000)
+        log(i)
+      }
+      expect({ a: 1 }).toBe({ a: 1 })
+    })
+
+    test('should throw after the timeout', async ({ expect }) => {
       await delay(10000)
       expect({ a: 1 }).toBe({ a: 1 })
     })

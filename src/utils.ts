@@ -1,3 +1,5 @@
+import type { Func } from './types'
+
 export const uuid = () => {
   return Math.round(Math.random() * 10 ** 12)
 }
@@ -22,4 +24,15 @@ export const timer = () => {
     else if (end < 1000) return `${colors.yellow}(${end}ms)${colors.none}`
     else return `${colors.red}(${end}ms)${colors.none}`
   }
+}
+
+export const race = async <T>(fn: Func<void, T>, ms: number, er: string) => {
+  let id: NodeJS.Timeout
+
+  return Promise.race([
+    (async () => await fn())(),
+    new Promise(
+      (_, reject) => (id = setTimeout(() => reject(new Error(er)), ms)),
+    ),
+  ]).finally(() => clearTimeout(id))
 }
