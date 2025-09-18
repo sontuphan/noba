@@ -1,3 +1,4 @@
+import Assert from './assert'
 import Expect from './expect'
 import Logger from './info/logger'
 import Reporter from './info/reporter'
@@ -30,6 +31,7 @@ export type CallbackParams = {
     >
   test: BaseCallbackParams & {
     expect: <T>(value: T) => InstanceType<typeof Expect<T>>
+    assert: InstanceType<typeof Assert>
   }
 }
 
@@ -179,9 +181,10 @@ export default class Runner {
 
     try {
       const expect = <T>(value: T) => new Expect(value, this.logger)
+      const assert = new Assert(this.logger)
 
       await race(
-        async () => await cb({ log: this.logger.log, expect }),
+        async () => await cb({ log: this.logger.log, expect, assert }),
         this.timeout,
         `Cannot complete the task in ${this.timeout}ms.`,
       )
