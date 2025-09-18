@@ -1,7 +1,7 @@
 import Expect from './expect'
 import Logger from './info/logger'
 import Reporter from './info/reporter'
-import type { Func } from './types'
+import type { Func } from './types/generic'
 import { race, timer } from './utils'
 
 export type RunnerConfig = {
@@ -22,6 +22,7 @@ export type CallbackParams = {
       InstanceType<typeof Runner>,
       | 'describe'
       | 'test'
+      | 'it'
       | 'beforeEach'
       | 'afterEach'
       | 'beforeAll'
@@ -141,6 +142,7 @@ export default class Runner {
       log: runner.logger.log,
       describe: runner.describe,
       test: runner.test,
+      it: runner.it,
       beforeEach: runner.beforeEach,
       afterEach: runner.afterEach,
       beforeAll: runner.beforeAll,
@@ -185,9 +187,9 @@ export default class Runner {
       )
 
       groupEnd()
-      const ms = timerEnd()
+      const { message } = timerEnd()
 
-      this.logger.green(description, ms)
+      this.logger.green(description, message)
       this.reporter.pass()
     } catch (er) {
       groupEnd()

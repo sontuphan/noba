@@ -51,15 +51,15 @@ describe('unit test', async ({
   })
 })
 
-describe('type test', ({ describe }) => {
-  describe('nested type test', async ({ test }) => {
-    test('should catch this exception', async () => {
+describe('unit it', ({ describe }) => {
+  describe('nested type test', async ({ it }) => {
+    it('should catch this exception', async () => {
       setTimeout(() => {
         throw new Error('an uncaught error')
       }, 1000)
     })
 
-    test('should keep counting', async ({ expect, log }) => {
+    it('should keep counting', async ({ expect, log }) => {
       for (let i = 0; i < 10; i++) {
         await delay(1000)
         log(i)
@@ -67,7 +67,7 @@ describe('type test', ({ describe }) => {
       expect({ a: 1 }).toBe({ a: 1 })
     })
 
-    test('should throw after the timeout', async ({ expect }) => {
+    it('should throw after the timeout', async ({ expect }) => {
       await delay(10000)
       expect({ a: 1 }).toBe({ a: 1 })
     })

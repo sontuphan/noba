@@ -1,4 +1,4 @@
-import type { Func } from './types'
+import type { Func } from './types/generic'
 
 export const uuid = () => {
   return Math.round(Math.random() * 10 ** 12)
@@ -20,9 +20,14 @@ export const timer = () => {
   const start = Date.now()
   return () => {
     const end = Date.now() - start
-    if (end < 300) return `${colors.green}(${end}ms)${colors.none}`
-    else if (end < 1000) return `${colors.yellow}(${end}ms)${colors.none}`
-    else return `${colors.red}(${end}ms)${colors.none}`
+    if (end < 300)
+      return { time: end, message: `${colors.green}(${end}ms)${colors.none}` }
+    else if (end < 1000)
+      return {
+        time: end,
+        message: `${colors.yellow}(${end}ms)${colors.none}`,
+      }
+    else return { time: end, message: `${colors.red}(${end}ms)${colors.none}` }
   }
 }
 
