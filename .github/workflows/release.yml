@@ -10,6 +10,9 @@ on:
       - master
       - next
 
+env:
+  NODE_VERSION: 20
+
 jobs:
   test:
     runs-on: ubuntu-latest
@@ -17,8 +20,7 @@ jobs:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
         with:
-          node-version: 24
-          registry-url: https://registry.npmjs.org
+          node-version: ${{ env.NODE_VERSION }}
       - name: Install dependencies
         run: npm install
       - name: Build & Link
@@ -42,14 +44,15 @@ jobs:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
         with:
-          node-version: 24
-          registry-url: https://registry.npmjs.org
+          node-version: ${{ env.NODE_VERSION }}
       - name: Install dependencies
         run: npm install
-      - name: Build & Test the library
+      - name: Build
         run: npm run build
-      - name: Release new sematic version
+      - name: Release
+        run: |
+          npm whoami
+          npm run ci:release
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
-        run: npm run ci:release

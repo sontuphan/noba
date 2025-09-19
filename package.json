@@ -1,7 +1,7 @@
 {
   "name": "noba",
   "version": "1.0.0",
-  "description": "The test framework for Bare",
+  "description": "The isometric test framework for javascript/typescript",
   "main": "dist/index.js",
   "bin": {
     "noba": "bin/node.js",
