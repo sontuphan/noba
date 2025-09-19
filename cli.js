@@ -2,13 +2,23 @@ const process = require('process')
 const { spawn } = require('child_process')
 const { command, flag, footer, description, rest } = require('paparam')
 
-const [, , ...args] = process.argv
+/**
+ * Utils
+ */
 
 const red = (e) => `\x1b[31m${e}\x1b[0m`
 const green = (e) => `\x1b[32m${e}\x1b[0m`
 const yellow = (e) => `\x1b[33m${e}\x1b[0m`
 const blue = (e) => `\x1b[34m${e}\x1b[0m`
 const purple = (e) => `\x1b[35m${e}\x1b[0m`
+
+const trim = (str) => str.slice(1, -1)
+
+/**
+ * CLI
+ */
+
+const [, , ...args] = process.argv
 
 const cmd = command(
   purple('tare'),
@@ -27,12 +37,20 @@ const cmd = command(
   rest(green('<files>')),
 ).parse(args)
 
+/**
+ * Parse params
+ */
+
 if (!cmd) process.exit(1)
 
 const {
   flags: { timeout: TARE_TIMEOUT },
 } = cmd
 const files = cmd.rest
+
+/**
+ * Spawn a child process
+ */
 
 const spawnSync = (file) => {
   const TARE_MAIN_ID = Math.round(Math.random() * 10 ** 12).toString()
@@ -46,14 +64,13 @@ const spawnSync = (file) => {
     },
   }
 
-  const softTrim = (str) => str.slice(1, -1)
-
   const filter = (msg, out) => {
     if (!msg.startsWith(TARE_MAIN_ID)) return out(msg)
+    else msg.trim()
 
     msg
       .split(TARE_MAIN_ID)
-      .map((e) => softTrim(e))
+      .map((e) => trim(e))
       .filter((e) => !!e)
       .reduce((e, _, i, a) => {
         if (i % 2 === 0) e.push(a.slice(i, i + 2))
@@ -69,7 +86,7 @@ const spawnSync = (file) => {
   return new Promise((resolve, reject) => {
     console.log(`\n${yellow(file)}`)
 
-    const child = spawn('node', [file], {
+    const child = spawn('bare', [file], {
       env: {
         ...process.env,
         TARE_TIMEOUT,
@@ -77,18 +94,22 @@ const spawnSync = (file) => {
       },
     })
 
-    child.stdout.setEncoding('utf8')
-    child.stderr.setEncoding('utf8')
-
-    child.stdout.on('data', (log) => filter(log.trim(), console.log))
-    child.stderr.on('data', (log) => filter(log.trim(), console.error))
-
-    child.on('close', (code) => {
+    child.on('exit', (code) => {
       if (!code) return resolve(result)
       return reject()
     })
+
+    child.stdout.setEncoding('utf8')
+    child.stderr.setEncoding('utf8')
+
+    child.stdout.on('data', (log) => filter(log, console.log))
+    child.stderr.on('data', (log) => filter(log, console.error))
   })
 }
+
+/**
+ * Main
+ */
 
 ;(async () => {
   let errors = []
@@ -121,4 +142,7 @@ const spawnSync = (file) => {
     red(`- ${fail} fail${fail > 1 ? 's' : ''}`),
     '\n',
   )
+
+  if (fail) return process.exit(1)
+  return process.exit(0)
 })()
