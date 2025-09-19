@@ -148,9 +148,9 @@ const spawnSync = (file) => {
     console.error(error)
   }
 
-  console.log(yellow(`\n[Env: ${runtime}]`))
+  console.log(yellow(`\nNoba [Env: ${runtime}]`))
   console.log(
-    ` Run total`,
+    `Run total`,
     blue(`${total} test${total > 1 ? 's' : ''}`),
     'in',
     blue(`${end / 1000}s:`),
