@@ -1,4 +1,4 @@
-import { describe } from 'tare'
+import { describe } from 'isotest'
 
 describe('assert.isOk', ({ test }) => {
   test('should be a truthy value', ({ assert }) => {

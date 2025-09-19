@@ -1,10 +1,12 @@
 {
-  "name": "tare",
+  "name": "isotest",
   "version": "1.0.0",
   "description": "The test framework for Bare",
   "main": "dist/index.js",
   "bin": {
-    "tare-bare": "bin/bare.js"
+    "isotest": "bin/node.js",
+    "isotest-node": "bin/node.js",
+    "isotest-bare": "bin/bare.js"
   },
   "module": "dist/index.mjs",
   "source": "src/index.ts",
@@ -31,24 +33,25 @@
   },
   "scripts": {
     "build": "tsup src/index.ts --clean --format cjs,esm --dts --sourcemap",
-    "pretest": "npm run build && tsup tests/**/*.ts --clean --silent --external tare --format cjs --out-dir tmp",
-    "test": "TARE_MAIN_ID=0 bare ./tmp/ok.test.js"
+    "pretest": "npm run build && tsup tests/**/*.ts --clean --silent --external isotest --format cjs --out-dir tmp",
+    "test": "ISOTEST_MAIN_ID=0 bare ./tmp/ok.test.js"
   },
   "keywords": [
     "test",
+    "node",
     "bare"
   ],
   "author": "Tu Phan <tu.phan@tether.io>",
   "license": "MIT",
+  "dependencies": {
+    "bare-process": "^4.2.1",
+    "bare-subprocess": "^5.1.2",
+    "paparam": "^1.8.6"
+  },
   "devDependencies": {
     "@types/node": "^24.5.0",
     "bare": "^1.22.0",
     "tsup": "^8.5.0",
     "typescript": "^5.9.2"
-  },
-  "dependencies": {
-    "bare-process": "^4.2.1",
-    "bare-subprocess": "^5.1.2",
-    "paparam": "^1.8.6"
   }
 }

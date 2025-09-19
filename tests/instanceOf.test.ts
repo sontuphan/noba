@@ -1,4 +1,4 @@
-import { describe } from 'tare'
+import { describe } from 'isotest'
 
 describe('instance of', ({ test }) => {
   class Foo {}

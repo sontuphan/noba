@@ -82,7 +82,7 @@ export default class Runner {
   }
 
   get isMain() {
-    return this.id === process.env.TARE_MAIN_ID
+    return this.id === process.env.ISOTEST_MAIN_ID
   }
 
   run = async () => {

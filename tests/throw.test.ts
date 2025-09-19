@@ -1,6 +1,6 @@
-import { delay, describe } from 'tare'
+import { delay, describe } from 'isotest'
 
-describe('tare.throw', ({ test }) => {
+describe('isotest.throw', ({ test }) => {
   test('should throw an exception', () => {
     setTimeout(() => {
       throw { an: 'exception' }

@@ -1,11 +1,11 @@
 import process from 'process'
 import Runner from './runner'
 
-if (!process.env.TARE_MAIN_ID) process.exit(1)
+if (!process.env.ISOTEST_MAIN_ID) process.exit(1)
 
 export const { describe, test, it } = new Runner(
-  process.env.TARE_MAIN_ID,
-  Number(process.env.TARE_TIMEOUT) || undefined,
+  process.env.ISOTEST_MAIN_ID,
+  Number(process.env.ISOTEST_TIMEOUT) || undefined,
 )
 
 export * from './utils'

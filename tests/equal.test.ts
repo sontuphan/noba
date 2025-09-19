@@ -1,4 +1,4 @@
-import { describe } from 'tare'
+import { describe } from 'isotest'
 
 describe('expect.to.equal', ({ test }) => {
   test('should compare 2 numbers', ({ expect }) => {
