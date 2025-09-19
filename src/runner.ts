@@ -69,13 +69,18 @@ export default class Runner {
         const handleUncaughtException = (er: any) => {
           this.reporter.catch('Uncaught Exception', er)
         }
+        const handleUnhandledRejection = (er: any) => {
+          this.reporter.catch('Unhandled Rejection', er)
+        }
         process.on('uncaughtException', handleUncaughtException)
+        process.on('unhandledRejection', handleUnhandledRejection)
         // Run the tree of tests
         await this.run()
         // Emit the report
         this.reporter.report()
         // Teardown
         process.off('uncaughtException', handleUncaughtException)
+        process.off('unhandledRejection', handleUnhandledRejection)
         return process.exit(0)
       })
     }
@@ -86,15 +91,22 @@ export default class Runner {
   }
 
   run = async () => {
-    await this.runBeforeAll()
+    try {
+      await this.runBeforeAll()
+    } catch (er) {
+      this.reporter.uncatch('beforeAll', er)
+    }
 
     for (const { type, description, cb } of this.jobs) {
       if (type === 'describe') await this.runDescribe(description, cb)
-      else if (type === 'test') await this.runTest(description, cb)
-      else throw new Error('Invalid job.')
+      if (type === 'test') await this.runTest(description, cb)
     }
 
-    await this.runAfterAll()
+    try {
+      await this.runAfterAll()
+    } catch (er) {
+      this.reporter.uncatch('afterAll', er)
+    }
   }
 
   /**
@@ -116,21 +128,28 @@ export default class Runner {
     description: string,
     cb: Func<CallbackParams['describe'], T> = () => {},
   ) => {
-    this.reporter.blue(description)
     const groupEnd = this.reporter.group()
 
     const runner = new Runner(uuid(), this.timeout, this, this.reporter)
 
-    await cb({
-      log: runner.reporter.log,
-      describe: runner.describe,
-      test: runner.test,
-      it: runner.it,
-      beforeEach: runner.beforeEach,
-      afterEach: runner.afterEach,
-      beforeAll: runner.beforeAll,
-      afterAll: runner.afterAll,
-    })
+    try {
+      await cb({
+        log: runner.reporter.log,
+        describe: runner.describe,
+        test: runner.test,
+        it: runner.it,
+        beforeEach: runner.beforeEach,
+        afterEach: runner.afterEach,
+        beforeAll: runner.beforeAll,
+        afterAll: runner.afterAll,
+      })
+
+      this.reporter.blue(description)
+    } catch (er) {
+      this.reporter.red(description)
+      this.reporter.uncatch(description, er)
+    }
+
     await runner.run()
 
     groupEnd()
@@ -155,7 +174,11 @@ export default class Runner {
     description: string,
     cb: Func<CallbackParams['test'], T> = () => {},
   ) => {
-    await this.runBeforeEach()
+    try {
+      await this.runBeforeEach()
+    } catch (er) {
+      this.reporter.uncatch('beforeEach', er)
+    }
 
     const groupEnd = this.reporter.group()
     const timerEnd = timer()
@@ -182,7 +205,11 @@ export default class Runner {
       this.reporter.catch(description, er)
     }
 
-    await this.runAfterEach()
+    try {
+      await this.runAfterEach()
+    } catch (er) {
+      this.reporter.uncatch('afterEach', er)
+    }
   }
 
   /**

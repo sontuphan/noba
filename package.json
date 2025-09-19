@@ -35,8 +35,8 @@
   },
   "scripts": {
     "build": "tsup src/index.ts --clean --format cjs,esm --dts --sourcemap",
-    "pretest": "npm run build && tsup tests/**/*.ts --clean --silent --external noba --format cjs --out-dir tmp",
-    "test": "NOBA_MAIN_ID=0 bare ./tmp/ok.test.js",
+    "pretest": "npm run build && tsup tests --clean --silent --external noba --format cjs --out-dir tmp",
+    "test": "NOBA_MAIN_ID=0 bare ./tmp/each.test.js",
     "ci:release": "semantic-release"
   },
   "keywords": [

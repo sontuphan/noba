@@ -39,4 +39,8 @@ export default class Logger {
   blue = (msg: any = '', ...args: any[]) => {
     this.log(`${colors.blue}${msg}`, ...args, colors.none)
   }
+
+  purple = (msg: any = '', ...args: any[]) => {
+    this.log(`${colors.purple}${msg}`, ...args, colors.none)
+  }
 }

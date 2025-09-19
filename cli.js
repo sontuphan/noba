@@ -78,6 +78,7 @@ const spawnSync = (file) => {
       total: 0,
       fail: 0,
       success: 0,
+      exception: 0,
     },
   }
 
@@ -133,6 +134,7 @@ const spawnSync = (file) => {
   let total = 0
   let fail = 0
   let success = 0
+  let exception = 0
 
   const start = Date.now()
   for (const file of files) {
@@ -141,6 +143,7 @@ const spawnSync = (file) => {
     total += re.summary.total
     fail += re.summary.fail
     success += re.summary.success
+    exception += re.summary.exception
   }
   const end = Date.now() - start
 
@@ -155,12 +158,14 @@ const spawnSync = (file) => {
     'in',
     blue(`${end / 1000}s:`),
     '\n',
-    green(`- ${success} success${success > 1 ? 'es' : ''}`),
+    green(`- ${success}\tsuccess${success > 1 ? 'es' : ''}`),
     '\n',
-    red(`- ${fail} fail${fail > 1 ? 's' : ''}`),
+    red(`- ${fail}\tfail${fail > 1 ? 's' : ''}`),
+    '\n',
+    purple(`- ${exception}\texception${exception > 1 ? 's' : ''}`),
     '\n',
   )
 
-  if (fail) return process.exit(1)
+  if (fail || exception) return process.exit(1)
   return process.exit(0)
 })()
