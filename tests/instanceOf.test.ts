@@ -1,7 +1,16 @@
-import { test } from 'tare'
+import { describe } from 'tare'
 
-test('should be instance of Error', ({ assert }) => {
-  const er = new Error()
-  assert.notInstanceOf(er, Error)
-  er
+describe('instance of', ({ test }) => {
+  class Foo {}
+  class Bar {}
+
+  test('should be instance of Foo', ({ assert }) => {
+    const foo: any = new Foo()
+    assert.instanceOf(foo, Foo)
+  })
+
+  test('should be not instance of Foo', ({ assert }) => {
+    const bar = new Bar()
+    assert.notInstanceOf(bar, Foo)
+  })
 })
