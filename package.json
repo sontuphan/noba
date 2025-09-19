@@ -46,7 +46,7 @@
   ],
   "author": "Tu Phan <tu.phan@tether.io>",
   "license": "MIT",
-  "repository": "git@github.com:sontuphan/tare.git",
+  "repository": "git@github.com:sontuphan/noba.git",
   "publishConfig": {
     "access": "public",
     "registry": "https://registry.npmjs.org/"
