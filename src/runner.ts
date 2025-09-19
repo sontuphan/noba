@@ -128,6 +128,7 @@ export default class Runner {
     description: string,
     cb: Func<CallbackParams['describe'], T> = () => {},
   ) => {
+    this.reporter.blue(description)
     const groupEnd = this.reporter.group()
 
     const runner = new Runner(uuid(), this.timeout, this, this.reporter)
@@ -143,10 +144,7 @@ export default class Runner {
         beforeAll: runner.beforeAll,
         afterAll: runner.afterAll,
       })
-
-      this.reporter.blue(description)
     } catch (er) {
-      this.reporter.red(description)
       this.reporter.uncatch(description, er)
     }
 

@@ -1,8 +1,7 @@
 import { delay, describe } from 'noba'
 
 describe('noba > all', ({ describe, beforeAll, afterAll }) => {
-  beforeAll(async ({ log }) => {
-    log('beforeAll')
+  beforeAll(async () => {
     await delay(1000)
   })
 
@@ -18,8 +17,7 @@ describe('noba > all', ({ describe, beforeAll, afterAll }) => {
     })
   })
 
-  afterAll(async ({ log }) => {
-    log('afterAll')
+  afterAll(async () => {
     await delay(1000)
   })
 })

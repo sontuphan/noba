@@ -1,10 +1,8 @@
 import { delay, describe } from 'noba'
 
 describe('noba > each', ({ describe, beforeEach, afterEach }) => {
-  beforeEach(async ({ log }) => {
-    log('beforeEach')
+  beforeEach(async () => {
     await delay(1000)
-    throw new Error('before-each')
   })
 
   describe('should be the first middle describe', ({ test }) => {
@@ -19,8 +17,7 @@ describe('noba > each', ({ describe, beforeEach, afterEach }) => {
     })
   })
 
-  afterEach(async ({ log }) => {
-    log('afterEach')
+  afterEach(async () => {
     await delay(1000)
   })
 })
