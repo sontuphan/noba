@@ -49,14 +49,8 @@ jobs:
         run: npm install
       - name: Build
         run: npm run build
-      - name: Configure npm
-        run: echo "//registry.npmjs.org/:_authToken=${NPM_TOKEN}" > ~/.npmrc
-        env:
-          NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
       - name: Release
-        run: |
-          npm whoami
-          npm run ci:release
+        run: npm run ci:release
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
