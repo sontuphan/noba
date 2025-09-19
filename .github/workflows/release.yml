@@ -10,9 +10,6 @@ on:
       - master
       - next
 
-env:
-  NODE_VERSION: 24
-
 jobs:
   test:
     runs-on: ubuntu-latest
@@ -20,7 +17,7 @@ jobs:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
         with:
-          node-version: ${{ env.NODE_VERSION }}
+          node-version: 24
           registry-url: https://registry.npmjs.org
       - name: Install dependencies
         run: npm install
@@ -45,7 +42,7 @@ jobs:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
         with:
-          node-version: ${{ env.NODE_VERSION }}
+          node-version: 24
           registry-url: https://registry.npmjs.org
       - name: Install dependencies
         run: npm install
