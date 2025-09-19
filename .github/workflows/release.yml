@@ -49,7 +49,7 @@ jobs:
       - name: Build & Test the library
         run: npm run build
       - name: Release new sematic version
-        run: npm run ci:release
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
+        run: npm run ci:release
