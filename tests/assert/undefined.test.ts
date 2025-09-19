@@ -1,6 +1,6 @@
 import { describe } from 'noba'
 
-describe('assert.undefined', ({ test }) => {
+describe('assert > undefined', ({ test }) => {
   test('should be undefined', ({ assert }) => {
     assert.isUndefined(undefined)
   })
