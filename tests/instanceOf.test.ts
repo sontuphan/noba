@@ -6,7 +6,7 @@ describe('instance of', ({ test }) => {
 
   test('should be instance of Foo', ({ assert }) => {
     const foo: any = new Foo()
-    assert.instanceOf(foo, Foo)
+    if (assert.instanceOf(foo, Foo)) foo
   })
 
   test('should be not instance of Foo', ({ assert }) => {
