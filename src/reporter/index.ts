@@ -4,6 +4,7 @@ import Logger from './logger'
 export default class Reporter extends Logger {
   private success = 0
   private fail = 0
+  private exception = 0
 
   private errors: Array<[string, any]> = []
 
@@ -36,6 +37,11 @@ export default class Reporter extends Logger {
     this.success += 1
   }
 
+  uncatch = (description: string, er: any) => {
+    this.exception += 1
+    this.errors.push([description, er])
+  }
+
   catch = (description: string, er: any) => {
     this.fail += 1
     this.errors.push([description, er])
@@ -51,6 +57,7 @@ export default class Reporter extends Logger {
       total: this.fail + this.success,
       fail: this.fail,
       success: this.success,
+      exception: this.exception,
     }
     this.json(JSON.stringify(data))
 
