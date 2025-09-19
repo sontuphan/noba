@@ -1,32 +1,67 @@
 {
-  "name": "tare",
-  "version": "1.0.0",
-  "description": "The platform-agnostic test framework",
-  "main": "dist/index.cjs",
-  "module": "dist/index.js",
+  "name": "noba",
+  "version": "1.0.0-next.1",
+  "description": "The isometric test framework for javascript/typescript",
+  "main": "dist/index.js",
+  "bin": {
+    "noba": "bin/node.js",
+    "noba-node": "bin/node.js",
+    "noba-bare": "bin/bare.js"
+  },
+  "module": "dist/index.mjs",
   "source": "src/index.ts",
   "types": "dist/index.d.ts",
   "files": [
-    "dist/**"
+    "dist/**",
+    "bin/**",
+    "cli.js"
   ],
+  "imports": {
+    "process": {
+      "bare": "bare-process",
+      "default": "process"
+    },
+    "child_process": {
+      "bare": "bare-subprocess",
+      "default": "child_process"
+    }
+  },
   "exports": {
     ".": {
       "types": "./dist/index.d.ts",
-      "import": "./dist/index.js",
-      "require": "./dist/index.cjs"
+      "import": "./dist/index.mjs",
+      "require": "./dist/index.js"
     }
   },
   "scripts": {
-    "build": "tsup src/index.ts --format cjs,esm --dts",
-    "test": ""
+    "build": "tsup src/index.ts --clean --format cjs,esm --dts --sourcemap",
+    "pretest": "npm run build && tsup tests/**/*.ts --clean --silent --external noba --format cjs --out-dir tmp",
+    "test": "NOBA_MAIN_ID=0 bare ./tmp/ok.test.js",
+    "ci:release": "semantic-release"
   },
   "keywords": [
     "test",
+    "node",
     "bare"
   ],
   "author": "Tu Phan <tu.phan@tether.io>",
   "license": "MIT",
+  "repository": "git@github.com:sontuphan/noba.git",
+  "publishConfig": {
+    "access": "public",
+    "registry": "https://registry.npmjs.org/"
+  },
+  "dependencies": {
+    "bare-process": "^4.2.1",
+    "bare-subprocess": "^5.1.2",
+    "paparam": "^1.8.6"
+  },
   "devDependencies": {
+    "@semantic-release/exec": "^7.1.0",
+    "@semantic-release/git": "^10.0.1",
+    "@semantic-release/github": "^11.0.6",
+    "@types/node": "^24.5.0",
+    "semantic-release": "^24.2.8",
     "tsup": "^8.5.0",
     "typescript": "^5.9.2"
   }
