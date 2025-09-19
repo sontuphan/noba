@@ -1,4 +1,4 @@
-import { describe } from 'isotest'
+import { describe } from 'noba'
 
 describe('assert.isOk', ({ test }) => {
   test('should be a truthy value', ({ assert }) => {

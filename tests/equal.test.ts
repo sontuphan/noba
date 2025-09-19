@@ -1,4 +1,4 @@
-import { describe } from 'isotest'
+import { describe } from 'noba'
 
 describe('expect.to.equal', ({ test }) => {
   test('should compare 2 numbers', ({ expect }) => {

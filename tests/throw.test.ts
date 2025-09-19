@@ -1,6 +1,6 @@
-import { delay, describe } from 'isotest'
+import { delay, describe } from 'noba'
 
-describe('isotest.throw', ({ test }) => {
+describe('noba.throw', ({ test }) => {
   test('should throw an exception', () => {
     setTimeout(() => {
       throw { an: 'exception' }

@@ -1,4 +1,4 @@
-import { describe } from 'isotest'
+import { describe } from 'noba'
 
 describe('instance of', ({ test }) => {
   class Foo {}

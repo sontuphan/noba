@@ -1,12 +1,12 @@
 {
-  "name": "isotest",
+  "name": "noba",
   "version": "1.0.0",
   "description": "The test framework for Bare",
   "main": "dist/index.js",
   "bin": {
-    "isotest": "bin/node.js",
-    "isotest-node": "bin/node.js",
-    "isotest-bare": "bin/bare.js"
+    "noba": "bin/node.js",
+    "noba-node": "bin/node.js",
+    "noba-bare": "bin/bare.js"
   },
   "module": "dist/index.mjs",
   "source": "src/index.ts",
@@ -33,8 +33,8 @@
   },
   "scripts": {
     "build": "tsup src/index.ts --clean --format cjs,esm --dts --sourcemap",
-    "pretest": "npm run build && tsup tests/**/*.ts --clean --silent --external isotest --format cjs --out-dir tmp",
-    "test": "ISOTEST_MAIN_ID=0 bare ./tmp/ok.test.js"
+    "pretest": "npm run build && tsup tests/**/*.ts --clean --silent --external noba --format cjs --out-dir tmp",
+    "test": "NOBA_MAIN_ID=0 bare ./tmp/ok.test.js"
   },
   "keywords": [
     "test",

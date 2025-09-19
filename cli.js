@@ -36,12 +36,12 @@ const softTrim = (str) => str.slice(1, -1)
 const [, , ...args] = process.argv
 
 const cmd = command(
-  purple('isotest'),
+  purple('noba'),
   description(blue('The test framework for Bare')),
   footer(
-    `${blue('For example:')}\n${purple('isotest')} -t 3000 ${green(
+    `${blue('For example:')}\n${purple('noba')} -t 3000 ${green(
       './tests/*.test.js - GOOD',
-    )}\n${purple('isotest')} ${green('./tests/*.test.js')} ${red(
+    )}\n${purple('noba')} ${green('./tests/*.test.js')} ${red(
       '-t 3000 - BAD',
     )}`,
   ),
@@ -61,7 +61,7 @@ const runtime = detectRuntime()
 if (!runtime || !cmd) process.exit(1)
 
 const {
-  flags: { timeout: ISOTEST_TIMEOUT },
+  flags: { timeout: NOBA_TIMEOUT },
 } = cmd
 const files = cmd.rest
 
@@ -70,7 +70,7 @@ const files = cmd.rest
  */
 
 const spawnSync = (file) => {
-  const ISOTEST_MAIN_ID = Math.round(Math.random() * 10 ** 12).toString()
+  const NOBA_MAIN_ID = Math.round(Math.random() * 10 ** 12).toString()
 
   const result = {
     errors: [],
@@ -82,11 +82,11 @@ const spawnSync = (file) => {
   }
 
   const filter = (msg, out) => {
-    if (!msg.startsWith(ISOTEST_MAIN_ID)) return out(msg)
+    if (!msg.startsWith(NOBA_MAIN_ID)) return out(msg)
     else msg.trim()
 
     msg
-      .split(ISOTEST_MAIN_ID)
+      .split(NOBA_MAIN_ID)
       .map((e) => softTrim(e))
       .filter((e) => !!e)
       .reduce((e, _, i, a) => {
@@ -106,8 +106,8 @@ const spawnSync = (file) => {
     const child = spawn(runtime, [file], {
       env: {
         ...process.env,
-        ISOTEST_TIMEOUT,
-        ISOTEST_MAIN_ID,
+        NOBA_TIMEOUT,
+        NOBA_MAIN_ID,
       },
     })
 
