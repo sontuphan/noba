@@ -24,6 +24,10 @@
     "child_process": {
       "bare": "bare-subprocess",
       "default": "child_process"
+    },
+    "fs": {
+      "bare": "bare-fs",
+      "default": "fs"
     }
   },
   "exports": {
@@ -52,6 +56,7 @@
     "registry": "https://registry.npmjs.org/"
   },
   "dependencies": {
+    "bare-fs": "^4.4.4",
     "bare-process": "^4.2.1",
     "bare-subprocess": "^5.1.2",
     "c8": "^10.1.3",

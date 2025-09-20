@@ -1,5 +1,6 @@
 const process = require('process')
 const { spawn, spawnSync } = require('child_process')
+const { rmSync } = require('fs')
 const { command, flag, footer, description, rest } = require('paparam')
 const { version: nobaVersion } = require('./package.json')
 
@@ -79,11 +80,20 @@ const {
     coverageFormat = 'text',
   },
 } = cmd
+
+const coverageTmp = `${coverageDir}/tmp`
 const files = cmd.rest || []
 
 if (version) {
   console.log(purple('noba'), nobaVersion)
   process.exit(0)
+}
+
+if (coverage) {
+  rmSync(coverageTmp, {
+    recursive: true,
+    force: true,
+  })
 }
 
 /**
@@ -122,15 +132,16 @@ const spawnAsync = (file) => {
   return new Promise((resolve, reject) => {
     console.log(`\n${yellow(file)}`)
 
+    const env = {
+      ...process.env,
+      NOBA_TIMEOUT,
+      NOBA_MAIN_ID,
+    }
+    if (coverage) {
+      if (runtime === 'node') env.NODE_V8_COVERAGE = coverageTmp
+    }
     const child = spawn(runtime, [file], {
-      env: {
-        ...process.env,
-        NOBA_TIMEOUT,
-        NOBA_MAIN_ID,
-        NODE_V8_COVERAGE: coverage
-          ? `${coverageDir}/v8`
-          : process.env.NODE_V8_COVERAGE,
-      },
+      env,
     })
 
     child.on('exit', (code) => {
@@ -194,17 +205,18 @@ const spawnAsync = (file) => {
   )
 
   if (coverage) {
-    spawnSync(
-      'npx',
-      [
-        'c8',
-        'report',
-        `--temp-directory=${coverageDir}/v8`,
-        `--report-dir=${coverageDir}`,
-        `--reporter=${coverageFormat}`,
-      ],
-      { stdio: 'inherit', shell: true },
-    )
+    if (runtime === 'node')
+      spawnSync(
+        'npx',
+        [
+          'c8',
+          'report',
+          `--temp-directory=${coverageTmp}`,
+          `--report-dir=${coverageDir}`,
+          `--reporter=${coverageFormat}`,
+        ],
+        { stdio: 'inherit', shell: true },
+      )
   }
 
   if (fail || exception) return process.exit(1)
