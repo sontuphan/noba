@@ -27,8 +27,6 @@ const yellow = (e) => `\x1b[33m${e}\x1b[0m`
 const blue = (e) => `\x1b[34m${e}\x1b[0m`
 const purple = (e) => `\x1b[35m${e}\x1b[0m`
 
-const softTrim = (str) => str.slice(1, -1)
-
 /**
  * CLI
  */
@@ -60,6 +58,7 @@ const runtime = detectRuntime()
 
 if (!runtime || !cmd) process.exit(1)
 
+const NOBA_MAIN_ID = Math.round(Math.random() * 10 ** 12).toString()
 const {
   flags: { timeout: NOBA_TIMEOUT },
 } = cmd
@@ -70,8 +69,6 @@ const files = cmd.rest
  */
 
 const spawnSync = (file) => {
-  const NOBA_MAIN_ID = Math.round(Math.random() * 10 ** 12).toString()
-
   const result = {
     errors: [],
     summary: {
@@ -128,20 +125,25 @@ const spawnSync = (file) => {
 
 ;(async () => {
   let errors = []
+
   let total = 0
   let fail = 0
   let success = 0
   let exception = 0
 
   const start = Date.now()
+
   for (const file of files) {
     const re = await spawnSync(file)
+
     errors = errors.concat(re.errors)
+
     total += re.summary.total
     fail += re.summary.fail
     success += re.summary.success
     exception += re.summary.exception
   }
+
   const end = Date.now() - start
 
   for (const error of errors) {
