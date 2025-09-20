@@ -151,15 +151,15 @@ const spawnSync = (file) => {
   console.log(yellow(`\nNoba [Env: ${runtime}]`))
   console.log(
     `Run total`,
-    blue(`${total} test${total > 1 ? 's' : ''}`),
+    blue(`${total} ${total > 1 ? 'tests' : 'test'}`),
     'in',
     blue(`${end / 1000}s:`),
     '\n',
-    green(`- ${success}\tsuccess${success > 1 ? 'es' : ''}`),
+    green(`- ${success}\t${success > 1 ? 'successes' : 'success'}`),
     '\n',
-    red(`- ${fail}\tfail${fail > 1 ? 's' : ''}`),
+    red(`- ${fail}\t${fail > 1 ? 'fails' : 'fail'}`),
     '\n',
-    purple(`- ${exception}\texception${exception > 1 ? 's' : ''}`),
+    purple(`- ${exception}\t${exception > 1 ? 'exceptions' : 'exception'}`),
     '\n',
   )
 
