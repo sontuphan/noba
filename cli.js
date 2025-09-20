@@ -67,7 +67,7 @@ const {
 const files = cmd.rest || []
 
 if (version) {
-  console.log(nobaVersion)
+  console.log(purple('noba'), nobaVersion)
   process.exit(0)
 }
 
@@ -87,7 +87,7 @@ const spawnSync = (file) => {
   }
 
   const filter = (msg, out) => {
-    // For example: <123:type> </123:type>
+    // For example: <123:json> ... </123:json>
     const icpTag = /<(\d+):([a-z]+)> (.*?) <\/\1:\2>/gs
     const icpTypes = ['error', 'json', 'log']
 
