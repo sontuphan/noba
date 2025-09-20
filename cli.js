@@ -1,5 +1,5 @@
 const process = require('process')
-const { spawn } = require('child_process')
+const { spawn, spawnSync } = require('child_process')
 const { command, flag, footer, description, rest } = require('paparam')
 const { version: nobaVersion } = require('./package.json')
 
@@ -49,6 +49,15 @@ const cmd = command(
     'Set the test timeout in milliseconds (default: 10000)',
   ),
   flag('--version|-v', 'Show the noba version'),
+  flag('--coverage|-c', 'Enable the test coverage'),
+  flag(
+    '--coverage-dir <directory>',
+    'Set the coverage dir for the result (default: coverage)',
+  ),
+  flag(
+    '--coverage-format <text|html>',
+    'Set the coverage format for the result (default: text)',
+  ),
   rest(green('<files>')),
 ).parse(args)
 
@@ -62,7 +71,13 @@ if (!runtime || !cmd) process.exit(1)
 
 const NOBA_MAIN_ID = Math.round(Math.random() * 10 ** 12).toString()
 const {
-  flags: { timeout: NOBA_TIMEOUT, version },
+  flags: {
+    timeout: NOBA_TIMEOUT,
+    version,
+    coverage,
+    coverageDir = './coverage',
+    coverageFormat = 'text',
+  },
 } = cmd
 const files = cmd.rest || []
 
@@ -75,7 +90,7 @@ if (version) {
  * Spawn a child process
  */
 
-const spawnSync = (file) => {
+const spawnAsync = (file) => {
   const result = {
     errors: [],
     summary: {
@@ -88,13 +103,13 @@ const spawnSync = (file) => {
 
   const filter = (msg, out) => {
     // For example: <123:json> ... </123:json>
-    const icpTag = /<(\d+):([a-z]+)> (.*?) <\/\1:\2>/gs
-    const icpTypes = ['error', 'json', 'log']
+    const ipcTag = /<(\d+):([a-z]+)> (.*?) <\/\1:\2>/gs
+    const ipcTypes = ['error', 'json', 'log']
 
     let unhandled = true
 
-    for (const [, id, type, data] of msg.matchAll(icpTag)) {
-      if (id !== NOBA_MAIN_ID || !icpTypes.includes(type)) continue
+    for (const [, id, type, data] of msg.matchAll(ipcTag)) {
+      if (id !== NOBA_MAIN_ID || !ipcTypes.includes(type)) continue
       if (type === 'error') result.errors.push(data)
       if (type === 'json') result.summary = JSON.parse(data)
       if (type === 'log') out(data)
@@ -112,6 +127,9 @@ const spawnSync = (file) => {
         ...process.env,
         NOBA_TIMEOUT,
         NOBA_MAIN_ID,
+        NODE_V8_COVERAGE: coverage
+          ? `${coverageDir}/v8`
+          : process.env.NODE_V8_COVERAGE,
       },
     })
 
@@ -143,7 +161,7 @@ const spawnSync = (file) => {
   const start = Date.now()
 
   for (const file of files) {
-    const re = await spawnSync(file)
+    const re = await spawnAsync(file)
 
     errors = errors.concat(re.errors)
 
@@ -159,7 +177,8 @@ const spawnSync = (file) => {
     console.error(error)
   }
 
-  console.log(yellow(`\nNoba [Env: ${runtime}]`))
+  // Summary test result
+  console.log(yellow(`\nNoba ${version} [Env: ${runtime}]`))
   console.log(
     `Run total`,
     blue(`${total} ${total > 1 ? 'tests' : 'test'}`),
@@ -173,6 +192,20 @@ const spawnSync = (file) => {
     purple(`- ${exception}\t${exception > 1 ? 'exceptions' : 'exception'}`),
     '\n',
   )
+
+  if (coverage) {
+    spawnSync(
+      'npx',
+      [
+        'c8',
+        'report',
+        `--temp-directory=${coverageDir}/v8`,
+        `--report-dir=${coverageDir}`,
+        `--reporter=${coverageFormat}`,
+      ],
+      { stdio: 'inherit', shell: true },
+    )
+  }
 
   if (fail || exception) return process.exit(1)
   return process.exit(0)
