@@ -83,22 +83,19 @@ const spawnSync = (file) => {
   }
 
   const filter = (msg, out) => {
-    if (!msg.startsWith(NOBA_MAIN_ID)) return out(msg)
-    else msg.trim()
+    // For example: <123:type> </123:type>
+    const icpTag = /<(\d+):([a-z]+)> (.*?) <\/\1:\2>/gs
+    const icpTypes = ['error', 'json', 'log']
 
-    msg
-      .split(NOBA_MAIN_ID)
-      .map((e) => softTrim(e))
-      .filter((e) => !!e)
-      .reduce((e, _, i, a) => {
-        if (i % 2 === 0) e.push(a.slice(i, i + 2))
-        return e
-      }, [])
-      .forEach(([type, data]) => {
-        if (type === 'error') result.errors.push(data)
-        if (type === 'json') result.summary = JSON.parse(data)
-        if (type === 'log') out(data)
-      })
+    let unhandled = true
+    for (const [, id, type, data] of msg.matchAll(icpTag)) {
+      if (id !== NOBA_MAIN_ID || !icpTypes.includes(type)) continue
+      if (type === 'error') result.errors.push(data)
+      if (type === 'json') result.summary = JSON.parse(data)
+      if (type === 'log') out(data)
+      unhandled = false
+    }
+    if (unhandled) return out(msg)
   }
 
   return new Promise((resolve, reject) => {

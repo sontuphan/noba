@@ -14,23 +14,25 @@ export default class Reporter extends Logger {
 
   get tag() {
     return {
-      json: `${this.mainId} json ${this.mainId}`,
-      error: `${this.mainId} error ${this.mainId}`,
-      log: `${this.mainId} log ${this.mainId}`,
-      end: this.mainId,
+      json: [`<${this.mainId}:json>`, `</${this.mainId}:json>`],
+      error: [`<${this.mainId}:error>`, `</${this.mainId}:error>`],
+      log: [`<${this.mainId}:log>`, `</${this.mainId}:log>`],
     }
   }
 
   error = (...ers: any[]) => {
-    console.error(this.tag.error, ...ers, this.tag.end)
+    const [open, close] = this.tag.error
+    console.error(open, ...ers, close)
   }
 
   json = (data: string) => {
-    console.log(this.tag.json, data, this.tag.end)
+    const [open, close] = this.tag.json
+    console.log(open, data, close)
   }
 
   override log = (msg: any = '', ...args: any[]): void => {
-    console.log(this.tag.log, `${this.spacer}${msg}`, ...args, this.tag.end)
+    const [open, close] = this.tag.log
+    console.log(open, `${this.spacer}${msg}`, ...args, close)
   }
 
   pass = () => {
