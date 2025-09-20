@@ -1,6 +1,7 @@
 const process = require('process')
 const { spawn } = require('child_process')
 const { command, flag, footer, description, rest } = require('paparam')
+const { version: nobaVersion } = require('./package.json')
 
 /**
  * Utils
@@ -44,9 +45,10 @@ const cmd = command(
     )}`,
   ),
   flag(
-    '--timeout, -t <timeout>',
+    '--timeout|-t [timeout]',
     'Set the test timeout in milliseconds (default: 10000)',
   ),
+  flag('--version|-v', 'Show the noba version'),
   rest(green('<files>')),
 ).parse(args)
 
@@ -60,9 +62,14 @@ if (!runtime || !cmd) process.exit(1)
 
 const NOBA_MAIN_ID = Math.round(Math.random() * 10 ** 12).toString()
 const {
-  flags: { timeout: NOBA_TIMEOUT },
+  flags: { timeout: NOBA_TIMEOUT, version },
 } = cmd
-const files = cmd.rest
+const files = cmd.rest || []
+
+if (version) {
+  console.log(nobaVersion)
+  process.exit(0)
+}
 
 /**
  * Spawn a child process
