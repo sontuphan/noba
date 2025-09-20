@@ -85,6 +85,7 @@ const spawnSync = (file) => {
     const icpTypes = ['error', 'json', 'log']
 
     let unhandled = true
+
     for (const [, id, type, data] of msg.matchAll(icpTag)) {
       if (id !== NOBA_MAIN_ID || !icpTypes.includes(type)) continue
       if (type === 'error') result.errors.push(data)
@@ -92,6 +93,7 @@ const spawnSync = (file) => {
       if (type === 'log') out(data)
       unhandled = false
     }
+
     if (unhandled) return out(msg)
   }
 
