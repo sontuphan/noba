@@ -1,7 +1,7 @@
 import type { Func } from './types/generic'
 
-export const uuid = () => {
-  return Math.round(Math.random() * 10 ** 12).toString()
+export const uuid = (length = 12) => {
+  return Math.round(Math.random() * 10 ** length).toString()
 }
 
 export const delay = (ms: number) => {

@@ -1,23 +1,22 @@
 import { existsSync, renameSync, rmSync } from 'fs'
 import process from 'process'
 import Runner from './runner'
+import { uuid } from './utils'
 
 if (!process.env.NOBA_MAIN_ID) process.exit(1)
 
-if (process.env.NOBA_BARE_COVERAGE === 'true') {
-  require('bare-cov')({
-    dir: process.env.NOBA_COVERAGE_DIR,
-  })
+if (!!process.env.NOBA_BARE_COVERAGE) {
+  const dir = process.env.NOBA_BARE_COVERAGE
+
+  require('bare-cov')({ dir })
 
   process.once('exit', () => {
-    const v8Json = process.env.NOBA_COVERAGE_DIR + '/coverage-final.json'
+    const v8Json = dir + '/coverage-final.json'
 
     if (existsSync(v8Json)) rmSync(v8Json)
 
-    const oldDump = `${process.env.NOBA_COVERAGE_DIR}/v8-coverage.json`
-    const newDump = `${
-      process.env.NOBA_COVERAGE_DIR
-    }/coverage-${Date.now()}.json`
+    const oldDump = `${dir}/v8-coverage.json`
+    const newDump = `${dir}/coverage-${uuid(5)}-${Date.now()}.json`
 
     if (existsSync(oldDump)) renameSync(oldDump, newDump)
   })

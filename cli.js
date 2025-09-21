@@ -139,11 +139,8 @@ const spawnAsync = (file) => {
     }
 
     if (coverage) {
-      env.NOBA_COVERAGE_DIR = coverageTmp
-      env.NOBA_COVERAGE_FORMAT = coverageFormat
-
       if (runtime === 'node') env.NODE_V8_COVERAGE = coverageTmp
-      if (runtime === 'bare') env.NOBA_BARE_COVERAGE = true
+      if (runtime === 'bare') env.NOBA_BARE_COVERAGE = coverageTmp
     }
 
     const child = spawn(runtime, [file], { env })
