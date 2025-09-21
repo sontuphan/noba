@@ -137,17 +137,18 @@ const spawnAsync = (file) => {
       NOBA_TIMEOUT,
       NOBA_MAIN_ID,
     }
-    if (coverage) {
-      if (runtime === 'node') env.NODE_V8_COVERAGE = coverageTmp
-    }
-    const child = spawn(runtime, [file], {
-      env,
-    })
 
-    child.on('exit', (code) => {
-      if (!code) return resolve(result)
-      return reject()
-    })
+    if (coverage) {
+      env.NOBA_COVERAGE_DIR = coverageTmp
+      env.NOBA_COVERAGE_FORMAT = coverageFormat
+
+      if (runtime === 'node') env.NODE_V8_COVERAGE = coverageTmp
+      if (runtime === 'bare') env.NOBA_COVERAGE = true
+    }
+
+    const child = spawn(runtime, [file], { env })
+
+    child.on('exit', (code) => (!code ? resolve(result) : reject()))
 
     child.stdout.setEncoding('utf8')
     child.stderr.setEncoding('utf8')
@@ -205,7 +206,7 @@ const spawnAsync = (file) => {
   )
 
   if (coverage) {
-    if (runtime === 'node')
+    if (runtime === 'node' || runtime === 'bare')
       spawnSync(
         'npx',
         [

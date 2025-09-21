@@ -81,7 +81,6 @@ export default class Runner {
         // Teardown
         process.off('uncaughtException', handleUncaughtException)
         process.off('unhandledRejection', handleUnhandledRejection)
-        return process.exit(0)
       })
     }
   }

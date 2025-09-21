@@ -40,7 +40,7 @@
   "scripts": {
     "build": "tsup src/index.ts --clean --format cjs,esm --dts --sourcemap",
     "pretest": "npm run build && tsup tests --clean --silent --external noba --format cjs --out-dir tmp",
-    "test": "NOBA_MAIN_ID=0 bare ./tmp/all.test.js",
+    "test": "NOBA_MAIN_ID=0 node ./tmp/all.test.js",
     "ci:release": "semantic-release"
   },
   "keywords": [
@@ -56,6 +56,7 @@
     "registry": "https://registry.npmjs.org/"
   },
   "dependencies": {
+    "bare-cov": "^1.1.2",
     "bare-fs": "^4.4.4",
     "bare-process": "^4.2.1",
     "bare-subprocess": "^5.1.2",
