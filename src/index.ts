@@ -5,9 +5,6 @@ import Runner from './runner'
 if (!process.env.NOBA_MAIN_ID) process.exit(1)
 
 if (process.env.NOBA_COVERAGE === 'true') {
-  if (process.env.NOBA_COVERAGE_FORMAT === 'json') {
-    // TODO
-  }
   require('bare-cov')({
     dir: process.env.NOBA_COVERAGE_DIR,
   })
