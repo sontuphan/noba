@@ -64,7 +64,7 @@ export default class Runner {
     this.reporter = reporter || new Reporter(this.id)
 
     if (this.isMain) {
-      process.nextTick(async () => {
+      queueMicrotask(async () => {
         // Setup
         const handleUncaughtException = (er: any) => {
           this.reporter.catch('Uncaught Exception', er)

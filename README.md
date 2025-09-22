@@ -22,6 +22,10 @@ describe('sum', ({ test }) => {
 })
 ```
 
+```bash
+npx noba ./tests/*.test.js
+```
+
 ## Develop
 
 ```bash

@@ -59,6 +59,10 @@ const cmd = command(
     '--coverage-format <text|html>',
     'Set the coverage format for the result (default: text)',
   ),
+  flag(
+    '--register|-r <runner>',
+    'Override the default runner. For example, --register tsx to run tests in typescript.',
+  ),
   rest(green('<files>')),
 ).parse(args)
 
@@ -78,6 +82,7 @@ const {
     coverage,
     coverageDir = './coverage',
     coverageFormat = 'text',
+    register,
   },
 } = cmd
 
@@ -90,10 +95,7 @@ if (version) {
 }
 
 if (coverage) {
-  rmSync(coverageTmp, {
-    recursive: true,
-    force: true,
-  })
+  rmSync(coverageTmp, { recursive: true, force: true })
 }
 
 /**
@@ -132,6 +134,11 @@ const spawnAsync = (file) => {
   return new Promise((resolve, reject) => {
     console.log(`\n${yellow(file)}`)
 
+    // Transpile if typescript
+    if (file.endsWith('.ts')) {
+      console.log('typescript')
+    }
+
     const env = {
       ...process.env,
       NOBA_TIMEOUT,
@@ -139,14 +146,12 @@ const spawnAsync = (file) => {
     }
 
     if (coverage) {
-      env.NOBA_COVERAGE_DIR = coverageTmp
-      env.NOBA_COVERAGE_FORMAT = coverageFormat
-
       if (runtime === 'node') env.NODE_V8_COVERAGE = coverageTmp
-      if (runtime === 'bare') env.NOBA_BARE_COVERAGE = true
+      if (runtime === 'bare') env.NOBA_BARE_COVERAGE = coverageTmp
     }
 
-    const child = spawn(runtime, [file], { env })
+    const exec = register ? `./node_modules/.bin/${register}` : runtime
+    const child = spawn(exec, [file], { env })
 
     child.on('exit', (code) => (!code ? resolve(result) : reject()))
 
@@ -208,9 +213,8 @@ const spawnAsync = (file) => {
   if (coverage) {
     if (runtime === 'node' || runtime === 'bare')
       spawnSync(
-        'npx',
+        './node_modules/.bin/c8',
         [
-          'c8',
           'report',
           `--temp-directory=${coverageTmp}`,
           `--report-dir=${coverageDir}`,
