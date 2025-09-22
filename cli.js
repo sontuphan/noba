@@ -150,7 +150,7 @@ const spawnAsync = (file) => {
       if (runtime === 'bare') env.NOBA_BARE_COVERAGE = coverageTmp
     }
 
-    const exec = `./node_modules/.bin/${register}` || runtime
+    const exec = register ? `./node_modules/.bin/${register}` : runtime
     const child = spawn(exec, [file], { env })
 
     child.on('exit', (code) => (!code ? resolve(result) : reject()))
