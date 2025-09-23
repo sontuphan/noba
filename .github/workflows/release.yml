@@ -31,7 +31,7 @@ jobs:
       - name: Test
         run: |
           npm run pretest
-          noba ./tmp/**/*.test.js
+          noba ./tmp/**/*.test.mjs
   release:
     if: github.event_name == 'push' || github.event.pull_request.merged == true
     needs: test
