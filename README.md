@@ -32,9 +32,8 @@ npx noba ./tests/*.test.js
 # Link
 npm link
 
-# Test
-npm run pretest && noba-bare ./tmp/**/*.test.js
-
-# If your machine had installed clearz
-# npm run pretest && clearz && noba-bare ./tmp/**/*.test.js
+# Test Node
+npm run pretest && noba ./tmp/**/*.test.mjs
+# Test Bare
+npm run pretest && noba-bare ./tmp/**/*.test.mjs
 ```

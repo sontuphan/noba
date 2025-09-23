@@ -3,7 +3,7 @@ import { describe, spy } from 'noba'
 describe('noba > spy', ({ test }) => {
   const spiedCallback = spy((e: string, i: number) => ({ [e]: i }))
 
-  test('forEach mock function', ({ assert }) => {
+  test('should spy on the forEach function', ({ assert }) => {
     const data = ['a', 'b']
 
     data.forEach(spiedCallback)
