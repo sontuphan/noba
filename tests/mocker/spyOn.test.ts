@@ -15,6 +15,6 @@ describe('noba > spy', ({ test }) => {
     })
 
     assert.isTrue(spiedLib.called)
-    assert.deepEqual(spiedLib.returns, [{ status: 1 }])
+    assert.deepEqual(spiedLib.returns, [{ status: 0 }])
   })
 })

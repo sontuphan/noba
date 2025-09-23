@@ -13,7 +13,7 @@ export default class To<A> {
   }
 
   get be() {
-    return new Be(this.negated, this.reporter)
+    return new Be(this.actual, this.reporter, this.negated)
   }
 
   private expect = <E>(expected: E) => {

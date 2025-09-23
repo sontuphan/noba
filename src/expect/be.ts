@@ -5,7 +5,12 @@ export default class Be<A> {
     public readonly actual: A,
     private readonly reporter: Reporter,
     private readonly negated = false,
-  ) {}
+  ) {
+    return Object.assign(
+      (...args: Parameters<typeof this.be>) => this.be(...args),
+      this,
+    )
+  }
 
   get infinitive() {
     return this.negated ? 'not to be' : 'to be'

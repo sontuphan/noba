@@ -181,7 +181,7 @@ export default class Runner {
     const timerEnd = timer()
 
     try {
-      const expect = <T>(value: T) => new Expect(value, this.reporter)
+      const expect = <A>(value: A) => new Expect(value, this.reporter)
       const assert = new Assert(this.reporter)
 
       await race(

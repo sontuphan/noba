@@ -3,10 +3,6 @@ import Reporter from '../reporter'
 export default class Assert {
   constructor(private readonly reporter: Reporter) {}
 
-  get assert() {
-    return new Assert(this.reporter)
-  }
-
   private expect = <A, E>(actual: A, verb: string, expect: E) => {
     this.reporter.green('- Expected:', expect)
     this.reporter.red('- Received:', actual)

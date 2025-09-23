@@ -6,11 +6,11 @@ export default class Expect<A> {
   constructor(public readonly actual: A, private readonly reporter: Reporter) {}
 
   get not() {
-    return new Not<A>(this.actual, this.reporter)
+    return new Not(this.actual, this.reporter)
   }
 
   get to() {
-    return new To<A>(this.actual, this.reporter)
+    return new To(this.actual, this.reporter)
   }
 
   private expect = <E>(verb: string, expect: E) => {
@@ -64,18 +64,30 @@ export default class Expect<A> {
     )
   }
 
-  toBe = this.to.be.be
-  toBeDefined = this.to.be.defined
-  toBeUndefined = this.to.be.undefined
-  toBeTruthy = this.to.be.truthy
-  toBeFalsy = this.to.be.falsy
-  toBeNull = this.to.be.null
-  toBeNaN = this.to.be.nan
-  toBeOneOf = this.to.be.oneOf
-  toBeTypeOf = this.to.be.typeOf
-  toBeInstanceOf = this.to.be.instanceOf
+  toBe = (...args: Parameters<typeof this.to.be.be>) => this.to.be.be(...args)
+  toBeDefined = (...args: Parameters<typeof this.to.be.defined>) =>
+    this.to.be.defined(...args)
+  toBeUndefined = (...args: Parameters<typeof this.to.be.undefined>) =>
+    this.to.be.undefined(...args)
+  toBeTruthy = (...args: Parameters<typeof this.to.be.truthy>) =>
+    this.to.be.truthy(...args)
+  toBeFalsy = (...args: Parameters<typeof this.to.be.falsy>) =>
+    this.to.be.falsy(...args)
+  toBeNull = (...args: Parameters<typeof this.to.be.null>) =>
+    this.to.be.null(...args)
+  toBeNaN = (...args: Parameters<typeof this.to.be.nan>) =>
+    this.to.be.nan(...args)
+  toBeOneOf = (...args: Parameters<typeof this.to.be.oneOf>) =>
+    this.to.be.oneOf(...args)
+  toBeTypeOf = (...args: Parameters<typeof this.to.be.typeOf>) =>
+    this.to.be.typeOf(...args)
+  toBeInstanceOf = (...args: Parameters<typeof this.to.be.instanceOf>) =>
+    this.to.be.instanceOf(...args)
 
-  toEqual = this.to.equal
-  toContain = this.to.contain
-  toHaveLength = this.to.haveLength
+  toEqual = (...args: Parameters<typeof this.to.equal>) =>
+    this.to.equal(...args)
+  toContain = (...args: Parameters<typeof this.to.contain>) =>
+    this.to.contain(...args)
+  toHaveLength = (...args: Parameters<typeof this.to.haveLength>) =>
+    this.to.haveLength(...args)
 }
