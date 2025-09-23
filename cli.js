@@ -134,11 +134,6 @@ const spawnAsync = (file) => {
   return new Promise((resolve, reject) => {
     console.log(`\n${yellow(file)}`)
 
-    // Transpile if typescript
-    if (file.endsWith('.ts')) {
-      console.log('typescript')
-    }
-
     const env = {
       ...process.env,
       NOBA_TIMEOUT,
