@@ -1,18 +1,14 @@
-import { describe } from 'noba'
-
-const mock = async (path: String, mocks = {}) => {
-  const url = await import.meta.resolve(path)
-  const mod = await import(url)
-}
+import { describe, mock } from 'noba'
 
 describe('noba > mock', async ({ test }) => {
   const mockedData = 'mocked data'
 
-  const mockedFs = await mock('./fs.mock', {
-    fs: {
-      readFileSync: () => mockedData,
+  const mockedFs = await mock<typeof import('./fs.mock')>(
+    import.meta.resolve('./fs.mock.js'),
+    {
+      readPackageJson: () => mockedData,
     },
-  })
+  )
 
   test('should mock an ecma module', async ({ expect }) => {
     const data = mockedFs.readPackageJson()
