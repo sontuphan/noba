@@ -40,7 +40,7 @@
   "scripts": {
     "build": "tsup src/index.ts --clean --format cjs,esm --dts --sourcemap",
     "pretest": "npm run build && tsup-node tests --clean --silent --format esm --out-dir tmp",
-    "test": "NOBA_MAIN_ID=0 node ./tmp/all.test.mjs",
+    "test": "NOBA_MAIN_ID=0 node ./tmp/expect/be.test.mjs",
     "ci:release": "semantic-release"
   },
   "keywords": [

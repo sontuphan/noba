@@ -1,6 +1,6 @@
 import { describe } from 'noba'
 
-describe('expect > equal', ({ test }) => {
+describe('expect > toEqual', ({ test }) => {
   test('should compare 2 equal numbers', ({ expect }) => {
     expect(1).to.equal(1)
   })
