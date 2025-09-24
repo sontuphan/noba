@@ -5,10 +5,13 @@ export default class Be<A> {
     public readonly actual: A,
     private readonly reporter: Reporter,
     private readonly negated = false,
-  ) {
+  ) {}
+
+  static new = <A>(actual: A, reporter: Reporter, negated = false) => {
+    const be = new this(actual, reporter, negated)
     return Object.assign(
-      (...args: Parameters<typeof this.be>) => this.be(...args),
-      this,
+      (...args: Parameters<InstanceType<typeof Be<A>>['be']>) => be.be(...args),
+      be,
     )
   }
 

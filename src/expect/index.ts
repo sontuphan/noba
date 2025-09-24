@@ -64,7 +64,7 @@ export default class Expect<A> {
     )
   }
 
-  toBe = (...args: Parameters<typeof this.to.be.be>) => this.to.be.be(...args)
+  toBe = (...args: Parameters<typeof this.to.be>) => this.to.be(...args)
   toBeDefined = (...args: Parameters<typeof this.to.be.defined>) =>
     this.to.be.defined(...args)
   toBeUndefined = (...args: Parameters<typeof this.to.be.undefined>) =>

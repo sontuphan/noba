@@ -6,7 +6,7 @@ describe('expect > toBe', ({ test }) => {
     const b = a
 
     expect(a).toBe(b)
-    expect(a).to.be.be(b)
+    expect(a).to.be(b)
   })
 
   test('should not be same objects', ({ expect }) => {
@@ -14,7 +14,7 @@ describe('expect > toBe', ({ test }) => {
     const a_ = { a: 1 }
     const b = { b: 2 }
 
-    expect<Record<string, number>>(a).not.to.be.be(a_)
-    expect<Record<string, number>>(a).not.to.be.be(b)
+    expect<Record<string, number>>(a).not.to.be(a_)
+    expect<Record<string, number>>(a).not.to.be(b)
   })
 })

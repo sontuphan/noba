@@ -7,7 +7,6 @@ describe('expect > toHaveLength', ({ test }) => {
   })
 
   test('should not have the correct length', ({ expect }) => {
-    expect([1, 2, 3]).toHaveLength(2)
-    expect('0123456789').to.haveLength(9)
+    expect('0123456789').not.to.haveLength(9)
   })
 })
