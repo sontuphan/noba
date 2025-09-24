@@ -1,6 +1,6 @@
 export { spy, spyOn } from 'tinyspy'
 
-export const mock = async <T extends Record<string | symbol, any>>(
+export const shallowMock = async <T extends Record<string | symbol, any>>(
   path: string,
   mocks: Record<string | symbol, any> = {},
 ) => {

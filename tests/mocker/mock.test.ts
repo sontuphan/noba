@@ -1,10 +1,10 @@
-import { describe, mock } from 'noba'
+import { describe, shallowMock } from 'noba'
 
 describe('noba > mock', async ({ test }) => {
   const mockedData = 'mocked data'
 
-  const mockedFs = await mock<typeof import('./fs.mock')>(
-    import.meta.resolve('./fs.mock.js'),
+  const mockedFs = await shallowMock<typeof import('./fs.mock')>(
+    import.meta.resolve('./fs.mock'),
     {
       readPackageJson: () => mockedData,
     },
