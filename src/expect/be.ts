@@ -108,7 +108,9 @@ export default class Be<A> {
     throw new Error(this.expect(`type of ${type}`))
   }
 
-  private _instanceOf = <T>(constructor: new (...args: any[]) => T) => {
+  private _instanceOf = <T>(
+    constructor: new (...args: any[]) => T,
+  ): this is Be<T> => {
     return this.actual instanceof constructor
   }
 

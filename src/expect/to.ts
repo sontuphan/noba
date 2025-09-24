@@ -53,11 +53,11 @@ export default class To<A> {
     throw new Error(this.expect(`equal to ${expected}`))
   }
 
-  private _contain = (received: string) => {
+  private _contain = <T>(received: T) => {
     return Array.isArray(this.actual) && this.actual.includes(received)
   }
 
-  contain = (received: string) => {
+  contain = <T>(received: T) => {
     if (this.xor(this._contain(received))) return true
     throw new Error(this.expect(`contain ${received}`))
   }
