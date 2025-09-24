@@ -1,8 +1,8 @@
-const process = require('process')
-const { spawn, spawnSync } = require('child_process')
-const { rmSync } = require('fs')
-const { command, flag, footer, description, rest } = require('paparam')
-const { version: nobaVersion } = require('./package.json')
+import process from 'process'
+import { spawn, spawnSync } from 'child_process'
+import { rmSync } from 'fs'
+import { command, flag, footer, description, rest } from 'paparam'
+import { version as nobaVersion } from './package.json'
 
 /**
  * Utils
@@ -118,17 +118,29 @@ const spawnAsync = (file) => {
     const ipcTag = /<(\d+):([a-z]+)> (.*?) <\/\1:\2>/gs
     const ipcTypes = ['error', 'json', 'log']
 
-    let unhandled = true
+    let lastIndex = 0
 
-    for (const [, id, type, data] of msg.matchAll(ipcTag)) {
+    for (const match of msg.matchAll(ipcTag)) {
+      const [chunk, id, type, data] = match
+      const { index } = match
+
+      if (index > lastIndex) {
+        const rest = msg.slice(lastIndex, index)
+        if (rest !== '\n') out(rest)
+      }
+
       if (id !== NOBA_MAIN_ID || !ipcTypes.includes(type)) continue
       if (type === 'error') result.errors.push(data)
       if (type === 'json') result.summary = JSON.parse(data)
       if (type === 'log') out(data)
-      unhandled = false
+
+      lastIndex = index + chunk.length
     }
 
-    if (unhandled) return out(msg)
+    if (lastIndex < msg.length) {
+      const rest = msg.slice(lastIndex)
+      if (rest !== '\n') return out(rest)
+    }
   }
 
   return new Promise((resolve, reject) => {

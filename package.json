@@ -2,13 +2,14 @@
   "name": "noba",
   "version": "1.0.2",
   "description": "The isometric test framework for javascript/typescript",
-  "main": "dist/index.js",
+  "main": "dist/index.cjs",
+  "type": "module",
   "bin": {
     "noba": "bin/node.js",
     "noba-node": "bin/node.js",
     "noba-bare": "bin/bare.js"
   },
-  "module": "dist/index.mjs",
+  "module": "dist/index.js",
   "source": "src/index.ts",
   "types": "dist/index.d.ts",
   "files": [
@@ -33,14 +34,14 @@
   "exports": {
     ".": {
       "types": "./dist/index.d.ts",
-      "import": "./dist/index.mjs",
-      "require": "./dist/index.js"
+      "import": "./dist/index.js",
+      "require": "./dist/index.cjs"
     }
   },
   "scripts": {
     "build": "tsup src/index.ts --clean --format cjs,esm --dts --sourcemap",
     "pretest": "npm run build && tsup-node tests --clean --silent --format esm --out-dir tmp",
-    "test": "NOBA_MAIN_ID=0 node ./tmp/expect/be.test.mjs",
+    "test": "NOBA_MAIN_ID=0 node ./tmp/expect/be.test.js",
     "ci:release": "semantic-release"
   },
   "keywords": [

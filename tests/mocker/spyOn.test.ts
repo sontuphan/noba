@@ -8,7 +8,7 @@ describe('noba > spy', ({ test }) => {
     }
   })
 
-  test('spyOn on an ecma module', ({ assert }) => {
+  test('spyOn on object', ({ assert }) => {
     child.spawnSync('echo', ['this function was spied'], {
       stdio: 'inherit',
       shell: true,
