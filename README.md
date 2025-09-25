@@ -33,7 +33,7 @@ npx noba ./tests/*.test.js
 npm link
 
 # Test Node
-npm run pretest && noba ./tmp/**/*.test.mjs
+npm run pretest && noba ./tmp/**/*.test.js
 # Test Bare
-npm run pretest && noba-bare ./tmp/**/*.test.mjs
+npm run pretest && noba-bare ./tmp/**/*.test.js
 ```

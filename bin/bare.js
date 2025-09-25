@@ -1,3 +1,3 @@
 #!/usr/bin/env bare
 
-require('../cli.js')
+await import('../cli.js')
