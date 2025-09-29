@@ -47,6 +47,7 @@ export default class Runner {
   private readonly reporter: Reporter
 
   private jobs: Array<Job> = []
+  private queued: boolean = false
 
   private beforeAlls: Array<Func<HookParams['beforeAll'], any>> = []
   private afterAlls: Array<Func<HookParams['afterAll'], any>> = []
@@ -62,27 +63,6 @@ export default class Runner {
   ) {
     // This instance is created once in main and passed around
     this.reporter = reporter || new Reporter(this.id)
-
-    if (this.isMain) {
-      queueMicrotask(async () => {
-        // Setup
-        const handleUncaughtException = (er: any) => {
-          this.reporter.catch('Uncaught Exception', er)
-        }
-        const handleUnhandledRejection = (er: any) => {
-          this.reporter.catch('Unhandled Rejection', er)
-        }
-        process.on('uncaughtException', handleUncaughtException)
-        process.on('unhandledRejection', handleUnhandledRejection)
-        // Run the tree of tests
-        await this.run()
-        // Emit the report
-        this.reporter.report()
-        // Teardown
-        process.off('uncaughtException', handleUncaughtException)
-        process.off('unhandledRejection', handleUnhandledRejection)
-      })
-    }
   }
 
   get isMain() {
@@ -116,11 +96,34 @@ export default class Runner {
     description: string,
     cb: Func<CallbackParams['describe'], T> = () => {},
   ) => {
+    // Register the job
     this.jobs.push({
       type: 'describe',
       description,
       cb,
     })
+    // Register the queue
+    if (this.isMain && !this.queued) {
+      this.queued = true
+      queueMicrotask(async () => {
+        // Setup
+        const handleUncaughtException = (er: any) => {
+          this.reporter.catch('Uncaught Exception', er)
+        }
+        const handleUnhandledRejection = (er: any) => {
+          this.reporter.catch('Unhandled Rejection', er)
+        }
+        process.on('uncaughtException', handleUncaughtException)
+        process.on('unhandledRejection', handleUnhandledRejection)
+        // Run the tree of tests
+        await this.run()
+        // Emit the report
+        this.reporter.report()
+        // Teardown
+        process.off('uncaughtException', handleUncaughtException)
+        process.off('unhandledRejection', handleUnhandledRejection)
+      })
+    }
   }
 
   private runDescribe = async <T>(
