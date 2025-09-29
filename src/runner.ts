@@ -88,6 +88,31 @@ export default class Runner {
     }
   }
 
+  private plan = () => {
+    if (!this.isMain || this.queued) return
+
+    this.queued = true
+
+    return queueMicrotask(async () => {
+      // Setup
+      const handleUncaughtException = (er: any) => {
+        this.reporter.catch('Uncaught Exception', er)
+      }
+      const handleUnhandledRejection = (er: any) => {
+        this.reporter.catch('Unhandled Rejection', er)
+      }
+      process.on('uncaughtException', handleUncaughtException)
+      process.on('unhandledRejection', handleUnhandledRejection)
+      // Run the tree of tests
+      await this.run()
+      // Emit the report
+      this.reporter.report()
+      // Teardown
+      process.off('uncaughtException', handleUncaughtException)
+      process.off('unhandledRejection', handleUnhandledRejection)
+    })
+  }
+
   /**
    * Describe block
    */
@@ -102,28 +127,8 @@ export default class Runner {
       description,
       cb,
     })
-    // Register the queue
-    if (this.isMain && !this.queued) {
-      this.queued = true
-      queueMicrotask(async () => {
-        // Setup
-        const handleUncaughtException = (er: any) => {
-          this.reporter.catch('Uncaught Exception', er)
-        }
-        const handleUnhandledRejection = (er: any) => {
-          this.reporter.catch('Unhandled Rejection', er)
-        }
-        process.on('uncaughtException', handleUncaughtException)
-        process.on('unhandledRejection', handleUnhandledRejection)
-        // Run the tree of tests
-        await this.run()
-        // Emit the report
-        this.reporter.report()
-        // Teardown
-        process.off('uncaughtException', handleUncaughtException)
-        process.off('unhandledRejection', handleUnhandledRejection)
-      })
-    }
+    // Register the master plan
+    this.plan()
   }
 
   private runDescribe = async <T>(
@@ -163,11 +168,14 @@ export default class Runner {
     description: string,
     cb: Func<CallbackParams['test'], T> = () => {},
   ) => {
+    // Register the job
     this.jobs.push({
       type: 'test',
       description,
       cb,
     })
+    // Register the master plan
+    this.plan()
   }
 
   private runTest = async <T>(
