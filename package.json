@@ -68,7 +68,6 @@
     "registry": "https://registry.npmjs.org/"
   },
   "dependencies": {
-    "asciichart": "^1.5.25",
     "bare": "^1.22.0",
     "bare-cov": "^1.1.2",
     "bare-fs": "^4.4.4",
@@ -86,6 +85,7 @@
     "@semantic-release/github": "^11.0.6",
     "@types/asciichart": "^1.5.8",
     "@types/node": "^24.5.0",
+    "asciichart": "^1.5.25",
     "semantic-release": "^24.2.8",
     "tsup": "^8.5.0",
     "typescript": "^5.9.2"
