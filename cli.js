@@ -45,7 +45,7 @@ const cmd = command(
     )}`,
   ),
   flag(
-    '--timeout|-t [timeout]',
+    '--timeout|-t <timeout>',
     'Set the test timeout in milliseconds (default: 10000)',
   ),
   flag('--version|-v', 'Show the noba version'),
@@ -76,7 +76,7 @@ if (!runtime || !cmd) process.exit(1)
 const NOBA_MAIN_ID = Math.round(Math.random() * 10 ** 12).toString()
 const {
   flags: {
-    timeout: NOBA_TIMEOUT,
+    timeout: NOBA_TIMEOUT = 10000,
     version,
     coverage,
     coverageDir = './coverage',
@@ -159,7 +159,7 @@ const spawnAsync = (file) => {
     }
 
     const exec = register ? `./node_modules/.bin/${register}` : runtime
-    const child = spawn(exec, [file], { env })
+    const child = spawn(exec, ['--inspect', file], { env })
 
     child.on('exit', (code) => (!code ? resolve(result) : reject()))
 
