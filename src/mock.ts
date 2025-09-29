@@ -2,16 +2,6 @@ import Module, { type LoadOptions } from 'bare-module'
 import { URL } from 'bare-url'
 import { detectRuntime } from './utils'
 
-// @ts-ignore
-import { Addon } from 'bare'
-const { exports } = Addon.load(
-  Addon.resolve(
-    Object.keys(Addon.cache).find((m) => m.startsWith('builtin:bare-module')),
-    import.meta.url,
-  ),
-)
-console.log(exports)
-
 /**
  * Shallow mock to manipulate exports of a module
  * @param specifier The module
@@ -38,6 +28,17 @@ const _bareMock = async <T extends Record<string | symbol, any>>(
   parent: string,
   mocks: Partial<T> = {},
 ) => {
+  // @ts-ignore
+  const { Addon } = await import('bare')
+  const { exports } = Addon.load(
+    Addon.resolve(
+      Object.keys(Addon.cache).find((m) =>
+        /^builtin:bare-module@[A-Za-z0-9._-]+$/.test(m),
+      ),
+      import.meta.url,
+    ),
+  )
+
   const resolved = Module.resolve(specifier, new URL(parent))
 
   if (resolved.href in Module.cache)
