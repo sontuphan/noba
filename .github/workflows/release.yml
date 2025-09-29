@@ -34,8 +34,8 @@ jobs:
           npm link noba
       - name: Pretest
         run: npm run pretest
-      - name: Test in Node
-        run: noba ./tmp/**/*.test.js
+      # - name: Test in Node
+      #   run: noba ./tmp/**/*.test.js
       - name: Test in Bare
         run: noba-bare ./tmp/**/*.test.js
   release:

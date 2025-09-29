@@ -51,7 +51,7 @@
   },
   "scripts": {
     "build": "tsup",
-    "pretest": "npm run build && tsup-node tests --clean --silent --format esm --out-dir tmp",
+    "pretest": "tsup-node tests --clean --silent --format esm --out-dir tmp",
     "test": "NOBA_MAIN_ID=0 bare ./tmp/mocker/mock.test.js",
     "ci:release": "semantic-release"
   },
