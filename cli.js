@@ -45,7 +45,7 @@ const cmd = command(
     )}`,
   ),
   flag(
-    '--timeout|-t [timeout]',
+    '--timeout|-t <timeout>',
     'Set the test timeout in milliseconds (default: 10000)',
   ),
   flag('--version|-v', 'Show the noba version'),
@@ -76,7 +76,7 @@ if (!runtime || !cmd) process.exit(1)
 const NOBA_MAIN_ID = Math.round(Math.random() * 10 ** 12).toString()
 const {
   flags: {
-    timeout: NOBA_TIMEOUT,
+    timeout: NOBA_TIMEOUT = 10000,
     version,
     coverage,
     coverageDir = './coverage',

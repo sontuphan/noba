@@ -47,6 +47,7 @@ export default class Runner {
   private readonly reporter: Reporter
 
   private jobs: Array<Job> = []
+  private queued: boolean = false
 
   private beforeAlls: Array<Func<HookParams['beforeAll'], any>> = []
   private afterAlls: Array<Func<HookParams['afterAll'], any>> = []
@@ -62,27 +63,6 @@ export default class Runner {
   ) {
     // This instance is created once in main and passed around
     this.reporter = reporter || new Reporter(this.id)
-
-    if (this.isMain) {
-      queueMicrotask(async () => {
-        // Setup
-        const handleUncaughtException = (er: any) => {
-          this.reporter.catch('Uncaught Exception', er)
-        }
-        const handleUnhandledRejection = (er: any) => {
-          this.reporter.catch('Unhandled Rejection', er)
-        }
-        process.on('uncaughtException', handleUncaughtException)
-        process.on('unhandledRejection', handleUnhandledRejection)
-        // Run the tree of tests
-        await this.run()
-        // Emit the report
-        this.reporter.report()
-        // Teardown
-        process.off('uncaughtException', handleUncaughtException)
-        process.off('unhandledRejection', handleUnhandledRejection)
-      })
-    }
   }
 
   get isMain() {
@@ -108,6 +88,31 @@ export default class Runner {
     }
   }
 
+  private plan = () => {
+    if (!this.isMain || this.queued) return
+
+    this.queued = true
+
+    return queueMicrotask(async () => {
+      // Setup
+      const handleUncaughtException = (er: any) => {
+        this.reporter.catch('Uncaught Exception', er)
+      }
+      const handleUnhandledRejection = (er: any) => {
+        this.reporter.catch('Unhandled Rejection', er)
+      }
+      process.on('uncaughtException', handleUncaughtException)
+      process.on('unhandledRejection', handleUnhandledRejection)
+      // Run the tree of tests
+      await this.run()
+      // Emit the report
+      this.reporter.report()
+      // Teardown
+      process.off('uncaughtException', handleUncaughtException)
+      process.off('unhandledRejection', handleUnhandledRejection)
+    })
+  }
+
   /**
    * Describe block
    */
@@ -116,11 +121,14 @@ export default class Runner {
     description: string,
     cb: Func<CallbackParams['describe'], T> = () => {},
   ) => {
+    // Register the job
     this.jobs.push({
       type: 'describe',
       description,
       cb,
     })
+    // Register the master plan
+    this.plan()
   }
 
   private runDescribe = async <T>(
@@ -160,11 +168,14 @@ export default class Runner {
     description: string,
     cb: Func<CallbackParams['test'], T> = () => {},
   ) => {
+    // Register the job
     this.jobs.push({
       type: 'test',
       description,
       cb,
     })
+    // Register the master plan
+    this.plan()
   }
 
   private runTest = async <T>(

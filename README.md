@@ -31,6 +31,10 @@ npx noba ./tests/*.test.js
 ```bash
 # Link
 npm link
+npm link noba
+
+# Build
+npm run build
 
 # Test Node
 npm run pretest && noba ./tmp/**/*.test.js

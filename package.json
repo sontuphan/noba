@@ -12,6 +12,13 @@
   "module": "dist/index.js",
   "source": "src/index.ts",
   "types": "dist/index.d.ts",
+  "typesVersions": {
+    "*": {
+      "mock": [
+        "dist/mock.d.ts"
+      ]
+    }
+  },
   "files": [
     "dist/**",
     "bin/**",
@@ -36,12 +43,16 @@
       "types": "./dist/index.d.ts",
       "import": "./dist/index.js",
       "require": "./dist/index.cjs"
+    },
+    "./mock": {
+      "types": "./dist/mock.d.ts",
+      "import": "./dist/mock.js"
     }
   },
   "scripts": {
-    "build": "tsup src/index.ts --clean --format cjs,esm --dts --sourcemap",
-    "pretest": "npm run build && tsup-node tests --clean --silent --format esm --out-dir tmp",
-    "test": "NOBA_MAIN_ID=0 node ./tmp/expect/be.test.js",
+    "build": "tsup",
+    "pretest": "tsup-node tests --clean --silent --format esm --out-dir tmp",
+    "test": "NOBA_MAIN_ID=0 bare ./tmp/mocker/mock.test.js",
     "ci:release": "semantic-release"
   },
   "keywords": [
@@ -57,10 +68,13 @@
     "registry": "https://registry.npmjs.org/"
   },
   "dependencies": {
+    "bare": "^1.22.0",
     "bare-cov": "^1.1.2",
     "bare-fs": "^4.4.4",
+    "bare-module": "^5.0.3",
     "bare-process": "^4.2.1",
     "bare-subprocess": "^5.1.2",
+    "bare-url": "^2.2.2",
     "c8": "^10.1.3",
     "paparam": "^1.8.6",
     "tinyspy": "^4.0.4"
@@ -69,7 +83,9 @@
     "@semantic-release/exec": "^7.1.0",
     "@semantic-release/git": "^10.0.1",
     "@semantic-release/github": "^11.0.6",
+    "@types/asciichart": "^1.5.8",
     "@types/node": "^24.5.0",
+    "asciichart": "^1.5.25",
     "semantic-release": "^24.2.8",
     "tsup": "^8.5.0",
     "typescript": "^5.9.2"
