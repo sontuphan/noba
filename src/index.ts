@@ -1,3 +1,5 @@
+/// <reference path="./global.d.ts" />
+
 import { existsSync, renameSync, rmSync } from 'fs'
 import process from 'process'
 import Runner from './runner'

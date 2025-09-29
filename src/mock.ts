@@ -1,16 +1,30 @@
 import Module, { type LoadOptions } from 'bare-module'
 import { URL } from 'bare-url'
+import { detectRuntime } from './utils'
 
 // @ts-ignore
 import { Addon } from 'bare'
-const resolved = Addon.resolve('builtin:bare-module@5.0.3', import.meta.url)
-const { exports } = Addon.load(resolved)
+const { exports } = Addon.load(
+  Addon.resolve(
+    Object.keys(Addon.cache).find((m) => m.startsWith('builtin:bare-module')),
+    import.meta.url,
+  ),
+)
+console.log(exports)
 
+/**
+ * Shallow mock to manipulate exports of a module
+ * @param specifier The module
+ * @param parent Parent path (e.g. `import.meta.url`)
+ * @param mocks The mocked object
+ * @returns The mocked module
+ */
 export const shallowMock = async <T extends Record<string | symbol, any>>(
-  path: string,
+  specifier: string,
+  parent: string,
   mocks: Partial<T> = {},
 ): Promise<T> => {
-  const url = import.meta.resolve(path)
+  const url = import.meta.resolve(specifier, parent)
   const mod = await import(url)
   return new Proxy(mod, {
     get(target: T, key: string | symbol) {
@@ -19,7 +33,7 @@ export const shallowMock = async <T extends Record<string | symbol, any>>(
   })
 }
 
-export const deepMock = async <T extends Record<string | symbol, any>>(
+const _bareMock = async <T extends Record<string | symbol, any>>(
   specifier: string,
   parent: string,
   mocks: Partial<T> = {},
@@ -54,4 +68,22 @@ export const deepMock = async <T extends Record<string | symbol, any>>(
     )
     return mocked as any
   }
+}
+
+/**
+ * Deep mock where the mocked module will take effect globally
+ * @param specifier The module
+ * @param parent Parent path (e.g. `import.meta.url`)
+ * @param mocks The mocked object
+ * @returns `deepImport` to replace the native `import`
+ */
+export const deepMock = async <T extends Record<string | symbol, any>>(
+  specifier: string,
+  parent: string,
+  mocks: Partial<T> = {},
+) => {
+  const runtime = detectRuntime()
+
+  if (runtime === 'bare') return _bareMock(specifier, parent, mocks)
+  else throw new Error('Unsupported runtime')
 }
