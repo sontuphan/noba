@@ -159,7 +159,7 @@ const spawnAsync = (file) => {
     }
 
     const exec = register ? `./node_modules/.bin/${register}` : runtime
-    const child = spawn(exec, ['--inspect', file], { env })
+    const child = spawn(exec, [file], { env })
 
     child.on('exit', (code) => (!code ? resolve(result) : reject()))
 
