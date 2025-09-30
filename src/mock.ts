@@ -70,18 +70,19 @@ const _bareMock = async <T extends Record<string | symbol, any>>(
 
 const _nodeMock = async <T extends Record<string | symbol, any>>(
   specifier: string,
-  _parent: string,
+  parent: string,
   mocks: Partial<T> = {},
 ) => {
   const { default: esmock } = await import('esmock')
+  const { resolve } = await import('import-meta-resolve')
 
   return async <A>(url: string): Promise<A> => {
-    return await esmock(
+    return await esmock<A>(
       url,
-      import.meta.url,
+      parent,
       { [specifier]: mocks },
       {},
-      { resolver: import.meta.resolve },
+      { resolver: resolve },
     )
   }
 }
