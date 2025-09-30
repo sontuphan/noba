@@ -36,10 +36,6 @@
     "fs": {
       "bare": "bare-fs",
       "default": "fs"
-    },
-    "url": {
-      "bare": "bare-url",
-      "default": "url"
     }
   },
   "exports": {

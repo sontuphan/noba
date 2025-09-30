@@ -62,23 +62,27 @@ const _bareMock = async <T extends Record<string | symbol, any>>(
     return _load(url, opts)
   }
 
-  return <A>(module: string, parent: string): A => {
-    const { exports: mocked } = Module.load(
-      Module.resolve(module, new URL(parent)),
-    )
+  return async <A>(url: string): Promise<A> => {
+    const { exports: mocked } = Module.load(new URL(url))
     return mocked as A
   }
 }
 
 const _nodeMock = async <T extends Record<string | symbol, any>>(
   specifier: string,
-  parent: string,
+  _parent: string,
   mocks: Partial<T> = {},
 ) => {
-  const { default: Module } = (await import('node:module')) as any
+  const { default: esmock } = await import('esmock')
 
-  return <A>(module: string, parent: string): A => {
-    return mocks as any
+  return async <A>(url: string): Promise<A> => {
+    return await esmock(
+      url,
+      import.meta.url,
+      { [specifier]: mocks },
+      {},
+      { resolver: import.meta.resolve },
+    )
   }
 }
 

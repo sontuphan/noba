@@ -1,5 +1,6 @@
 import { describe } from 'noba'
 import { deepMock } from 'noba/mock'
+import esmock from 'esmock'
 
 describe('noba > mock', async ({ describe }) => {
   const mockedData = 'mocked data'
@@ -14,9 +15,8 @@ describe('noba > mock', async ({ describe }) => {
     )
 
     test('should deep mock a file', async ({ expect }) => {
-      const { readChart } = deepImport<typeof import('./fs.mock')>(
-        './fs.mock',
-        import.meta.url,
+      const { readChart } = await deepImport<typeof import('./fs.mock')>(
+        import.meta.resolve('./fs.mock.js'),
       )
       const data = readChart()
       expect(data).to.be(mockedData)
