@@ -1,6 +1,5 @@
 import { describe } from 'noba'
 import { deepMock } from 'noba/mock'
-import esmock from 'esmock'
 
 describe('noba > mock', async ({ describe }) => {
   const mockedData = 'mocked data'
