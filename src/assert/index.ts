@@ -3,10 +3,6 @@ import Reporter from '../reporter'
 export default class Assert {
   constructor(private readonly reporter: Reporter) {}
 
-  get assert() {
-    return new Assert(this.reporter)
-  }
-
   private expect = <A, E>(actual: A, verb: string, expect: E) => {
     this.reporter.green('- Expected:', expect)
     this.reporter.red('- Received:', actual)
@@ -199,5 +195,86 @@ export default class Assert {
   isNotExist = <T>(value: T, msg?: string) => {
     if (!this._isExist(value)) return true
     throw new Error(msg || this.expect(value, 'to be', 'null or undefined'))
+  }
+
+  private _throws = (fn: () => void, message: string | RegExp) => {
+    try {
+      fn()
+      return false
+    } catch (error: any) {
+      if (typeof message === 'string') return error?.message === message
+      if (message instanceof RegExp) return message.test(error?.message)
+      return false
+    }
+  }
+
+  throws = (fn: () => void, message: string | RegExp, msg?: string) => {
+    if (this._throws(fn, message)) return true
+    throw new Error(
+      msg ||
+        this.expect(
+          'the function',
+          'to throw',
+          `an error with message sastifying ${msg}`,
+        ),
+    )
+  }
+
+  doesNotThrow = (fn: () => void, message: string | RegExp, msg?: string) => {
+    if (!this._throws(fn, message)) return true
+    throw new Error(
+      msg ||
+        this.expect(
+          'the function',
+          'not to throw',
+          `an error with message sastifying ${msg}`,
+        ),
+    )
+  }
+
+  private _rejects = async (
+    fn: () => Promise<void>,
+    message: string | RegExp,
+  ) => {
+    try {
+      await fn()
+      return false
+    } catch (error: any) {
+      if (typeof message === 'string') return error?.message === message
+      if (message instanceof RegExp) return message.test(error?.message)
+      return false
+    }
+  }
+
+  rejects = async (
+    fn: () => Promise<void>,
+    message: string | RegExp,
+    msg?: string,
+  ) => {
+    if (await this._rejects(fn, message)) return true
+    throw new Error(
+      msg ||
+        this.expect(
+          'the function',
+          'to reject',
+          `an error with message sastifying ${msg}`,
+        ),
+    )
+  }
+
+  doesNotReject = async (
+    fn: () => Promise<void>,
+    message: string | RegExp,
+    msg?: string,
+  ) => {
+    if (!(await this._rejects(fn, message))) return true
+    throw new Error(
+      msg ||
+        this.expect(
+          'the function',
+          'not to reject',
+          `an error with message sastifying ${msg}`,
+        ),
+    )
   }
 }

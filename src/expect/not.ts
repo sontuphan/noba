@@ -1,10 +1,10 @@
-import Reporter from '../reporter'
+import Reporter from 'src/reporter'
 import To from './to'
 
-export default class Not<T> {
-  constructor(public readonly expect: T, private readonly reporter: Reporter) {}
+export default class Not<A> {
+  constructor(public readonly actual: A, private readonly reporter: Reporter) {}
 
   get to() {
-    return new To(this.expect, this.reporter, true)
+    return new To(this.actual, this.reporter, true)
   }
 }
