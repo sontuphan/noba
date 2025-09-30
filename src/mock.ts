@@ -3,17 +3,14 @@ import { detectRuntime } from './utils'
 
 /**
  * Shallow mock to manipulate exports of a module
- * @param specifier The module
- * @param parent Parent path (e.g. `import.meta.url`)
+ * @param url The absolute path to module (e.g. `import.meta.resolve('fs')`)
  * @param mocks The mocked object
  * @returns The mocked module
  */
 export const shallowMock = async <T extends Record<string | symbol, any>>(
-  specifier: string,
-  parent: string,
+  url: string,
   mocks: Partial<T> = {},
 ): Promise<T> => {
-  const url = import.meta.resolve(specifier, parent)
   const mod = await import(url)
   return new Proxy(mod, {
     get(target: T, key: string | symbol) {

@@ -6,8 +6,7 @@ describe('noba > shallowMock', async ({ describe }) => {
 
   describe('mock on an imported file', async ({ test }) => {
     const mocked = await shallowMock<typeof import('./fs.mock')>(
-      './fs.mock.js',
-      import.meta.url,
+      import.meta.resolve('./fs.mock.js'),
       {
         readPackageJson: () => mockedData,
       },
@@ -21,8 +20,7 @@ describe('noba > shallowMock', async ({ describe }) => {
 
   describe('mock on an imported package', async ({ test }) => {
     const mocked = await shallowMock<typeof import('fs')>(
-      'fs',
-      import.meta.url,
+      import.meta.resolve('fs'),
       {
         readFileSync: (): any => mockedData,
       },
