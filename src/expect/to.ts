@@ -54,11 +54,26 @@ export default class To<A> {
   }
 
   private _contain = <T>(received: T) => {
-    return Array.isArray(this.actual) && this.actual.includes(received)
+    if (typeof this.actual === 'string' && typeof received === 'string')
+      return this.actual.includes(received)
+    if (Array.isArray(this.actual)) return this.actual.includes(received)
+    return false
   }
 
   contain = <T>(received: T) => {
     if (this.xor(this._contain(received))) return true
+    throw new Error(this.expect(`contain ${received}`))
+  }
+
+  private _containEqual = <T>(received: T) => {
+    if (this._contain(received)) return true
+    if (!Array.isArray(this.actual)) return false
+    const index = this.actual.findIndex((a) => this._equal(a, received))
+    return index >= 0
+  }
+
+  containEqual = <T>(received: T) => {
+    if (this.xor(this._containEqual(received))) return true
     throw new Error(this.expect(`contain ${received}`))
   }
 

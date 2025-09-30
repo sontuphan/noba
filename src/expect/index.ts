@@ -88,6 +88,8 @@ export default class Expect<A> {
     this.to.equal(...args)
   toContain = (...args: Parameters<typeof this.to.contain>) =>
     this.to.contain(...args)
+  toContainEqual = (...args: Parameters<typeof this.to.containEqual>) =>
+    this.to.containEqual(...args)
   toHaveLength = (...args: Parameters<typeof this.to.haveLength>) =>
     this.to.haveLength(...args)
 }
