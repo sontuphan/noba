@@ -1,5 +1,6 @@
 import child from 'child_process'
-import { describe, spyOn } from 'noba'
+import { describe } from 'noba'
+import { spyOn } from 'noba/spy'
 
 describe('noba > spy', ({ test }) => {
   const spiedLib = spyOn(child, 'spawnSync', (): any => {

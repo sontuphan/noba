@@ -14,6 +14,9 @@
   "types": "dist/index.d.ts",
   "typesVersions": {
     "*": {
+      "spy": [
+        "dist/spy.d.ts"
+      ],
       "mock": [
         "dist/mock.d.ts"
       ]
@@ -44,15 +47,21 @@
       "import": "./dist/index.js",
       "require": "./dist/index.cjs"
     },
+    "./spy": {
+      "types": "./dist/spy.d.ts",
+      "import": "./dist/spy.js",
+      "require": "./dist/spy.cjs"
+    },
     "./mock": {
       "types": "./dist/mock.d.ts",
       "import": "./dist/mock.js"
     }
   },
   "scripts": {
+    "prebuild": "rimraf dist",
     "build": "tsup",
     "pretest": "tsup-node tests --clean --silent --format esm --out-dir tmp",
-    "test": "NOBA_MAIN_ID=0 bare ./tmp/mocker/mock.test.js",
+    "test": "NOBA_MAIN_ID=0 bare ./tmp/**/*.test.js",
     "ci:release": "semantic-release"
   },
   "keywords": [

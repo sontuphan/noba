@@ -35,7 +35,6 @@ if (!!process.env.NOBA_BARE_COVERAGE) {
  * Noba modules
  */
 export * from './utils'
-export { spy, spyOn } from 'tinyspy'
 export const { describe, test, it } = new Runner(
   process.env.NOBA_MAIN_ID,
   Number(process.env.NOBA_TIMEOUT) || undefined,
