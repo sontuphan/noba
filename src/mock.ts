@@ -80,9 +80,11 @@ const _nodeMock = async <T extends Record<string | symbol, any>>(
     return await esmock<A>(
       url,
       parent,
-      { [specifier]: mocks },
       {},
-      { resolver: resolve },
+      { [specifier]: mocks },
+      {
+        resolver: resolve,
+      },
     )
   }
 }
