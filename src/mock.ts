@@ -1,5 +1,4 @@
-import Module, { type LoadOptions } from 'bare-module'
-import { URL } from 'bare-url'
+import type { LoadOptions } from 'bare-module'
 import { detectRuntime } from './utils'
 
 /**
@@ -28,6 +27,9 @@ const _bareMock = async <T extends Record<string | symbol, any>>(
   parent: string,
   mocks: Partial<T> = {},
 ) => {
+  const { default: Module } = await import('bare-module')
+  const { URL } = await import('bare-url')
+
   // @ts-ignore
   const { Addon } = await import('bare')
   const { exports } = Addon.load(
@@ -47,27 +49,39 @@ const _bareMock = async <T extends Record<string | symbol, any>>(
     )
 
   const _load = Module.load
-  Module.load = function (url: URL, opts: LoadOptions): Module {
-    if (url.href !== resolved.href) return _load(url, opts)
-    const target = _load(url, opts)
-
-    const _setExport = exports.setExport
-    exports.setExport = function setExport(
-      namespace: any,
-      name: string,
-      _fn: any,
-    ) {
-      const fn = name in mocks ? mocks[name] : _fn
-      return _setExport(namespace, name, fn)
+  Module.load = function (url: InstanceType<typeof URL>, opts: LoadOptions) {
+    if (url.href === resolved.href) {
+      const _setExport = exports.setExport
+      exports.setExport = function setExport(
+        namespace: any,
+        name: string,
+        _fn: any,
+      ) {
+        const fn = name in mocks ? mocks[name] : _fn
+        return _setExport(namespace, name, fn)
+      }
     }
-    return target
+
+    return _load(url, opts)
   }
 
   return <A>(module: string, parent: string): A => {
     const { exports: mocked } = Module.load(
       Module.resolve(module, new URL(parent)),
     )
-    return mocked as any
+    return mocked as A
+  }
+}
+
+const _nodeMock = async <T extends Record<string | symbol, any>>(
+  specifier: string,
+  parent: string,
+  mocks: Partial<T> = {},
+) => {
+  const { default: Module } = (await import('node:module')) as any
+
+  return <A>(module: string, parent: string): A => {
+    return mocks as any
   }
 }
 
@@ -86,5 +100,6 @@ export const deepMock = async <T extends Record<string | symbol, any>>(
   const runtime = detectRuntime()
 
   if (runtime === 'bare') return _bareMock(specifier, parent, mocks)
+  if (runtime === 'node') return _nodeMock(specifier, parent, mocks)
   else throw new Error('Unsupported runtime')
 }
