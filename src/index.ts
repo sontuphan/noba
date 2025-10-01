@@ -4,6 +4,8 @@ import { existsSync, renameSync, rmSync } from 'fs'
 import process from 'process'
 import Runner from './runner'
 import { uuid } from './utils'
+// @ts-ignore
+import setupCoverage from 'bare-cov'
 
 if (!process.env.NOBA_MAIN_ID) process.exit(1)
 
@@ -19,7 +21,7 @@ if (!!process.env.NODE_V8_COVERAGE) {
  */
 if (!!process.env.NOBA_BARE_COVERAGE) {
   const dir = process.env.NOBA_BARE_COVERAGE
-  require('bare-cov')({ dir })
+  setupCoverage({ dir })
 
   process.once('exit', () => {
     const v8Json = dir + '/coverage-final.json'
