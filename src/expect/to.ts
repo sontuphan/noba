@@ -65,15 +65,15 @@ export default class To<A> {
     throw new Error(this.expect(`contain ${received}`))
   }
 
-  private _containEqual = <T>(received: T) => {
+  private _containEqual = <T>(actual: unknown, received: T) => {
     if (this._contain(received)) return true
-    if (!Array.isArray(this.actual)) return false
-    const index = this.actual.findIndex((a) => this._equal(a, received))
+    if (!Array.isArray(actual)) return false
+    const index = actual.findIndex((a) => this._equal(a, received))
     return index >= 0
   }
 
   containEqual = <T>(received: T) => {
-    if (this.xor(this._containEqual(received))) return true
+    if (this.xor(this._containEqual(this.actual, received))) return true
     throw new Error(this.expect(`contain an equal of ${received}`))
   }
 
@@ -86,5 +86,32 @@ export default class To<A> {
   haveLength = (received: number) => {
     if (this.xor(this._haveLength(received))) return true
     throw new Error(this.expect(`have the length of ${received}`))
+  }
+
+  private _haveBeenCalled = () => {
+    if (!this.actual) return false
+    if (typeof this.actual !== 'object') return false
+    if (Array.isArray(this.actual)) return false
+    if ('called' in this.actual) return !!this.actual.called
+    return false
+  }
+
+  haveBeenCalled = () => {
+    if (this.xor(this._haveBeenCalled())) return true
+    throw new Error(this.expect(`have been called`))
+  }
+
+  private _haveBeenCalledWith = (...args: any[]) => {
+    if (!this.actual) return false
+    if (typeof this.actual !== 'object') return false
+    if (Array.isArray(this.actual)) return false
+    if ('calls' in this.actual)
+      return this._containEqual(this.actual.calls, args)
+    return false
+  }
+
+  haveBeenCalledWith = (...args: any[]) => {
+    if (this.xor(this._haveBeenCalledWith(...args))) return true
+    throw new Error(this.expect(`have been called with ${args}`))
   }
 }
