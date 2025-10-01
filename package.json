@@ -1,6 +1,6 @@
 {
   "name": "noba",
-  "version": "1.3.0-next.4",
+  "version": "1.3.0-next.5",
   "description": "The isometric test framework for javascript/typescript",
   "main": "dist/index.cjs",
   "type": "module",
