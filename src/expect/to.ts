@@ -74,7 +74,7 @@ export default class To<A> {
 
   containEqual = <T>(received: T) => {
     if (this.xor(this._containEqual(received))) return true
-    throw new Error(this.expect(`contain ${received}`))
+    throw new Error(this.expect(`contain an equal of ${received}`))
   }
 
   private _haveLength = (received: number) => {
