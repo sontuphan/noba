@@ -90,7 +90,8 @@ export default class To<A> {
 
   private _haveBeenCalled = () => {
     if (!this.actual) return false
-    if (typeof this.actual !== 'object') return false
+    if (typeof this.actual !== 'object' && typeof this.actual !== 'function')
+      return false
     if (Array.isArray(this.actual)) return false
     if ('called' in this.actual) return !!this.actual.called
     return false
@@ -103,7 +104,8 @@ export default class To<A> {
 
   private _haveBeenCalledWith = (...args: any[]) => {
     if (!this.actual) return false
-    if (typeof this.actual !== 'object') return false
+    if (typeof this.actual !== 'object' && typeof this.actual !== 'function')
+      return false
     if (Array.isArray(this.actual)) return false
     if ('calls' in this.actual)
       return this._containEqual(this.actual.calls, args)
