@@ -240,8 +240,9 @@ export default class Assert {
       await fn()
       return false
     } catch (error: any) {
-      if (typeof message === 'string') return error?.message === message
-      if (message instanceof RegExp) return message.test(error?.message)
+      if (!error || !error.message) return false
+      if (typeof message === 'string') return error.message.includes(message)
+      if (message instanceof RegExp) return message.test(error.message)
       return false
     }
   }
