@@ -1,4 +1,5 @@
-import { describe, spy } from 'noba'
+import { describe } from 'noba'
+import { spy } from 'noba/spy'
 
 describe('noba > spy', ({ test }) => {
   const spiedCallback = spy((e: string, i: number) => ({ [e]: i }))

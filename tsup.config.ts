@@ -2,12 +2,11 @@ import { defineConfig } from 'tsup'
 
 export default defineConfig([
   {
-    entry: ['src/index.ts'],
+    entry: ['src/index.ts', 'src/spy.ts'],
     format: ['esm', 'cjs'],
     dts: true,
     sourcemap: true,
     splitting: false,
-    clean: true,
     outDir: 'dist',
   },
   {
@@ -16,7 +15,6 @@ export default defineConfig([
     dts: true,
     sourcemap: true,
     splitting: false,
-    clean: true,
     outDir: 'dist',
   },
 ])
