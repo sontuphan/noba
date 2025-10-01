@@ -1,7 +1,5 @@
 import type { MockObject } from './types/generic'
 import { detectRuntime } from './utils'
-import { parse } from 'acorn'
-import escodegen from 'escodegen'
 
 /**
  * Shallow mock to manipulate exports of a module
@@ -29,6 +27,8 @@ const _bareMock = async <T extends MockObject>(
 ) => {
   const { default: Module } = await import('bare-module')
   const { URL } = await import('bare-url')
+  const { parse } = await import('acorn')
+  const { generate } = await import('escodegen')
 
   // @ts-ignore
   const { Addon } = await import('bare')
@@ -129,7 +129,7 @@ const _bareMock = async <T extends MockObject>(
       return node
     })
 
-    return escodegen.generate(ast)
+    return generate(ast)
   }
 
   const _createModule = exports.createModule
