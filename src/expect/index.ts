@@ -20,44 +20,41 @@ export default class Expect<A> {
     return `Expect ${this.actual} ${verb} ${expect}.`
   }
 
-  private _throws = (fn: () => void, message: string | RegExp) => {
+  private _throws = (message: string | RegExp) => {
+    if (typeof this.actual !== 'function') return false
     try {
-      fn()
+      this.actual()
       return false
     } catch (error: any) {
-      if (typeof message === 'string') return error?.message === message
+      if (!error || !error.message) return false
+      if (typeof message === 'string') return error.message.includes(message)
       if (message instanceof RegExp) return message.test(error?.message)
       return false
     }
   }
 
-  throws = (fn: () => void, message: string | RegExp, msg?: string) => {
-    if (this._throws(fn, message)) return true
+  throws = (message: string | RegExp, msg?: string) => {
+    if (this._throws(message)) return true
     throw new Error(
       msg || this.expect('to throw', `an error with message sastifying ${msg}`),
     )
   }
 
-  private _rejects = async (
-    fn: () => Promise<void>,
-    message: string | RegExp,
-  ) => {
+  private _rejects = async (message: string | RegExp) => {
+    if (typeof this.actual !== 'function') return false
     try {
-      await fn()
+      await this.actual()
       return false
     } catch (error: any) {
-      if (typeof message === 'string') return error?.message === message
+      if (!error || !error.message) return false
+      if (typeof message === 'string') return error.message.includes(message)
       if (message instanceof RegExp) return message.test(error?.message)
       return false
     }
   }
 
-  rejects = async (
-    fn: () => Promise<void>,
-    message: string | RegExp,
-    msg?: string,
-  ) => {
-    if (await this._rejects(fn, message)) return true
+  rejects = async (message: string | RegExp, msg?: string) => {
+    if (await this._rejects(message)) return true
     throw new Error(
       msg ||
         this.expect('to reject', `an error with message sastifying ${msg}`),
@@ -92,4 +89,9 @@ export default class Expect<A> {
     this.to.containEqual(...args)
   toHaveLength = (...args: Parameters<typeof this.to.haveLength>) =>
     this.to.haveLength(...args)
+  toHaveBeenCalled = (...args: Parameters<typeof this.to.haveBeenCalled>) =>
+    this.to.haveBeenCalled(...args)
+  toHaveBeenCalledWith = (
+    ...args: Parameters<typeof this.to.haveBeenCalledWith>
+  ) => this.to.haveBeenCalledWith(...args)
 }

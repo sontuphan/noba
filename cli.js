@@ -22,6 +22,7 @@ const detectRuntime = () => {
   return ''
 }
 
+const gray = (e) => `\x1b[90m${e}\x1b[0m`
 const red = (e) => `\x1b[31m${e}\x1b[0m`
 const green = (e) => `\x1b[32m${e}\x1b[0m`
 const yellow = (e) => `\x1b[33m${e}\x1b[0m`
@@ -210,11 +211,15 @@ const spawnAsync = (file) => {
     'in',
     blue(`${end / 1000}s:`),
     '\n',
-    green(`- ${success}\t${success > 1 ? 'successes' : 'success'}`),
+    (success > 0 ? green : gray)(
+      `- ${success}\t${success > 1 ? 'successes' : 'success'}`,
+    ),
     '\n',
-    red(`- ${fail}\t${fail > 1 ? 'fails' : 'fail'}`),
+    (fail > 0 ? red : gray)(`- ${fail}\t${fail > 1 ? 'fails' : 'fail'}`),
     '\n',
-    purple(`- ${exception}\t${exception > 1 ? 'exceptions' : 'exception'}`),
+    (exception > 0 ? purple : gray)(
+      `- ${exception}\t${exception > 1 ? 'exceptions' : 'exception'}`,
+    ),
     '\n',
   )
 
