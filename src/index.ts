@@ -21,7 +21,7 @@ if (!!process.env.NODE_V8_COVERAGE) {
  */
 if (!!process.env.NOBA_BARE_COVERAGE) {
   const dir = process.env.NOBA_BARE_COVERAGE
-  setupCoverage({ dir })
+  setupCoverage({ dir, reporters: ['json'] })
 
   process.once('exit', () => {
     const v8Json = dir + '/coverage-final.json'
