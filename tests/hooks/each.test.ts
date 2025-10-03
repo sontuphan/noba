@@ -1,8 +1,8 @@
 import { delay, describe } from 'noba'
 
-describe('noba > all', ({ describe, beforeAll, afterAll }) => {
-  beforeAll(async () => {
-    await delay(1000)
+describe('noba > each', ({ describe, beforeEach, afterEach }) => {
+  beforeEach(async () => {
+    await delay(500)
   })
 
   describe('should be the first middle describe', ({ test }) => {
@@ -17,7 +17,7 @@ describe('noba > all', ({ describe, beforeAll, afterAll }) => {
     })
   })
 
-  afterAll(async () => {
-    await delay(1000)
+  afterEach(async () => {
+    await delay(500)
   })
 })
