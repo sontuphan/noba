@@ -49,11 +49,23 @@ export default class Runner {
   private jobs: Array<Job> = []
   private queued: boolean = false
 
-  private beforeAlls: Array<Func<HookParams['beforeAll'], any>> = []
-  private afterAlls: Array<Func<HookParams['afterAll'], any>> = []
+  private beforeAlls: Array<{
+    cb: Func<HookParams['beforeAll'], any>
+    timeout?: number
+  }> = []
+  private afterAlls: Array<{
+    cb: Func<HookParams['afterAll'], any>
+    timeout?: number
+  }> = []
 
-  private beforeEachs: Array<Func<HookParams['beforeEach'], any>> = []
-  private afterEachs: Array<Func<HookParams['afterEach'], any>> = []
+  private beforeEachs: Array<{
+    cb: Func<HookParams['beforeEach'], any>
+    timeout?: number
+  }> = []
+  private afterEachs: Array<{
+    cb: Func<HookParams['afterEach'], any>
+    timeout?: number
+  }> = []
 
   constructor(
     private readonly id: string,
@@ -230,13 +242,19 @@ export default class Runner {
    * Before all
    */
 
-  beforeAll = (cb?: Func<HookParams['beforeAll'], any>) => {
-    if (cb) this.beforeAlls.push(cb)
+  beforeAll = (cb?: Func<HookParams['beforeAll'], any>, timeout?: number) => {
+    if (cb) this.beforeAlls.push({ cb, timeout })
   }
 
   private runBeforeAll = async () => {
-    for (const cb of this.beforeAlls) {
-      await cb({ log: this.reporter.log })
+    for (const { cb, timeout } of this.beforeAlls) {
+      if (!timeout) await cb({ log: this.reporter.log })
+      else
+        await race(
+          async () => await cb({ log: this.reporter.log }),
+          timeout,
+          `Cannot complete beforeAll in ${timeout}ms.`,
+        )
     }
   }
 
@@ -244,13 +262,19 @@ export default class Runner {
    * After all
    */
 
-  afterAll = (cb?: Func<HookParams['afterAll'], any>) => {
-    if (cb) this.afterAlls.push(cb)
+  afterAll = (cb?: Func<HookParams['afterAll'], any>, timeout?: number) => {
+    if (cb) this.afterAlls.push({ cb, timeout })
   }
 
   private runAfterAll = async () => {
-    for (const cb of this.afterAlls) {
-      await cb({ log: this.reporter.log })
+    for (const { cb, timeout } of this.afterAlls) {
+      if (!timeout) await cb({ log: this.reporter.log })
+      else
+        await race(
+          async () => await cb({ log: this.reporter.log }),
+          timeout,
+          `Cannot complete afterAll in ${timeout}ms.`,
+        )
     }
   }
 
@@ -258,14 +282,20 @@ export default class Runner {
    * Before each
    */
 
-  beforeEach = (cb?: Func<HookParams['beforeEach'], any>) => {
-    if (cb) this.beforeEachs.push(cb)
+  beforeEach = (cb?: Func<HookParams['beforeEach'], any>, timeout?: number) => {
+    if (cb) this.beforeEachs.push({ cb, timeout })
   }
 
   runBeforeEach = async () => {
     await this.parent?.runBeforeEach()
-    for (const cb of this.beforeEachs) {
-      await cb({ log: this.reporter.log })
+    for (const { cb, timeout } of this.beforeEachs) {
+      if (!timeout) await cb({ log: this.reporter.log })
+      else
+        await race(
+          async () => await cb({ log: this.reporter.log }),
+          timeout,
+          `Cannot complete afterAll in ${timeout}ms.`,
+        )
     }
   }
 
@@ -273,14 +303,20 @@ export default class Runner {
    * After each
    */
 
-  afterEach = (cb?: Func<HookParams['afterEach'], any>) => {
-    if (cb) this.afterEachs.push(cb)
+  afterEach = (cb?: Func<HookParams['afterEach'], any>, timeout?: number) => {
+    if (cb) this.afterEachs.push({ cb, timeout })
   }
 
   runAfterEach = async () => {
     await this.parent?.runAfterEach()
-    for (const cb of this.afterEachs) {
-      await cb({ log: this.reporter.log })
+    for (const { cb, timeout } of this.afterEachs) {
+      if (!timeout) await cb({ log: this.reporter.log })
+      else
+        await race(
+          async () => await cb({ log: this.reporter.log }),
+          timeout,
+          `Cannot complete afterAll in ${timeout}ms.`,
+        )
     }
   }
 }
