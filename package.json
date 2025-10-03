@@ -79,7 +79,7 @@
   "dependencies": {
     "acorn": "^8.15.0",
     "bare": "^1.22.0",
-    "bare-cov": "^1.1.2",
+    "bare-cov": "^1.2.0",
     "bare-fs": "^4.4.4",
     "bare-module": "^5.0.3",
     "bare-process": "^4.2.1",
