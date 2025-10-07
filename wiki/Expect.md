@@ -41,3 +41,139 @@ describe('toEqual', ({ test }) => {
   })
 })
 ```
+
+# toBeTruthy
+
+Checks if a value is truthy.
+
+```ts
+describe('toBeTruthy', ({ test }) => {
+  test('should be truthy', ({ expect }) => {
+    expect(true).toBeTruthy() // Ok
+    expect(1).toBeTruthy() // Ok
+    expect('non-empty').toBeTruthy() // Ok
+    expect([]).toBeTruthy() // Ok
+    expect({}).toBeTruthy() // Ok
+  })
+})
+```
+
+# toBeFalsy
+
+Checks if a value is falsy.
+
+```ts
+describe('toBeFalsy', ({ test }) => {
+  test('should be falsy', ({ expect }) => {
+    expect(false).toBeFalsy() // Ok
+    expect(0).toBeFalsy() // Ok
+    expect('').toBeFalsy() // Ok
+    expect(null).toBeFalsy() // Ok
+    expect(undefined).toBeFalsy() // Ok
+  })
+})
+```
+
+# toBeNull
+
+Checks if a value is exactly `null`.
+
+```ts
+describe('toBeNull', ({ test }) => {
+  test('should be null', ({ expect }) => {
+    expect(null).toBeNull()
+    expect(null).to.be.null()
+  })
+})
+```
+
+# toBeNaN
+
+Checks if a value is exactly `NaN`.
+
+```ts
+describe('toBeNaN', ({ test }) => {
+  test('should be NaN', ({ expect }) => {
+    expect(NaN).toBeNaN()
+    expect(NaN).to.be.nan()
+  })
+})
+```
+
+# toBeUndefined
+
+Checks if a value is exactly `undefined`.
+
+```ts
+describe('toBeUndefined', ({ test }) => {
+  test('should be undefined', ({ expect }) => {
+    expect(undefined).toBeUndefined() // Ok
+    expect(null).toBeUndefined() // Failed
+  })
+})
+```
+
+# toContain
+
+Checks if an array or string contains a value.
+
+```ts
+describe('toContain', ({ test }) => {
+  test('should contain value in array', ({ expect }) => {
+    expect([1, 2, 3]).toContain(2) // Ok
+    expect(['a', 'b']).to.contain('b') // Ok
+  })
+
+  test('should contain substring', ({ expect }) => {
+    expect('hello world').toContain('world') // Ok
+  })
+})
+```
+
+# toContainEqual
+
+Checks if an array or string contains a value.
+
+```ts
+describe('toContainEqual', ({ test }) => {
+  test('should contain object in array', ({ expect }) => {
+    expect([{ a: 1 }, { b: 2 }]).toContainEqual({ b: 2 })
+  })
+})
+```
+
+# throws
+
+Checks if a function throws an error.
+
+```ts
+describe('throws', ({ test }) => {
+  test('should throw error', ({ expect }) => {
+    expect(() => {
+      throw new Error('failed function')
+    }).throws('failed') // Ok
+
+    expect(() => {
+      throw new Error('failed function')
+    }).throws('failed function') // Ok
+
+    expect(() => {
+      throw new Error('failed function')
+    }).throws(/failed/) // Ok
+  })
+})
+```
+
+# rejects
+
+Checks if an async function rejects.
+
+```ts
+describe('rejects', ({ test }) => {
+  test('should reject', async ({ expect }) => {
+    await expect(async () => {
+      throw new Error('failed function')
+    }).rejects('failed') // Ok
+  })
+})
+```
