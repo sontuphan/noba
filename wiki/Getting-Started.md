@@ -24,6 +24,10 @@ describe('my first test', ({ test }) => {
   test('should be ok', ({ assert }) => {
     assert.isOk(true)
   })
+
+  test('should be falsy', ({ expect }) => {
+    expect(false).to.be.falsy()
+  })
 })
 ```
 
