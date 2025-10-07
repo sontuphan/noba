@@ -1,0 +1,16 @@
+name: Publish Wiki
+
+on:
+  push:
+    branches:
+      - develop
+
+permissions:
+  contents: write
+
+jobs:
+  publish-wiki:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - uses: Andrew-Chen-Wang/github-wiki-action@v4
