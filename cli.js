@@ -1,6 +1,6 @@
 import process from 'process'
 import { spawn, spawnSync } from 'child_process'
-import { rmSync, readFileSync } from 'fs'
+import { rmSync } from 'fs'
 import { command, flag, footer, description, rest } from 'paparam'
 
 /**
@@ -90,9 +90,12 @@ const coverageTmp = `${coverageDir}/tmp`
 const files = cmd.rest || []
 
 if (version) {
-  const pkg = JSON.parse(readFileSync('./package.json', 'utf8'))
-
-  console.log(purple('noba'), pkg.version)
+  const {
+    default: { version: nobaVersion },
+  } = await import('./package.json', {
+    with: { type: 'json' },
+  })
+  console.log(purple('noba'), nobaVersion)
   process.exit(0)
 }
 
