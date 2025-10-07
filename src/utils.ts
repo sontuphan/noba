@@ -8,7 +8,14 @@ import type { Runtime } from './types/runtime'
  * @returns uuid
  */
 export const uuid = (length = 12) => {
-  return Math.round(Math.random() * 10 ** length).toString()
+  if (length <= 0) return ''
+  let uid = ''
+  while (uid.length < length) {
+    const num = Math.round(Math.random() * 10)
+    if (!uid && !num) continue
+    uid = uid + num.toString()
+  }
+  return uid
 }
 
 /**
