@@ -4,8 +4,6 @@ Welcome to Noba - The runtime-neutral testing framework.
 
 🤖 [CLI](/sontuphan/noba/wiki/cli)
 
-✅ [Examples](/sontuphan/noba/wiki/examples)
-
-👓 [Read the Noba Docs](/sontuphan/noba/wiki/references)
+✅ [Examples](/sontuphan/noba/tree/master/tests)
 
 Let's build your runtime-neutral tests. Write once, test everywhere.
