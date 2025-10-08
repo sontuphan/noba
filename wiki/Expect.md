@@ -113,6 +113,20 @@ describe('toBeUndefined', ({ test }) => {
 })
 ```
 
+# toBeDefined
+
+Checks if a value is not `undefined`.
+
+```ts
+describe('toBeDefined', ({ test }) => {
+  test('should be defined', ({ expect }) => {
+    expect(1).toBeDefined() // Ok
+    expect(null).toBeDefined() // Ok
+    expect(undefined).toBeDefined() // Failed
+  })
+})
+```
+
 # toContain
 
 Checks if an array or string contains a value.
@@ -138,6 +152,60 @@ Checks if an array or string contains a value.
 describe('toContainEqual', ({ test }) => {
   test('should contain object in array', ({ expect }) => {
     expect([{ a: 1 }, { b: 2 }]).toContainEqual({ b: 2 })
+  })
+})
+```
+
+# toBeOneOf
+
+Checks if a value is strictly equal to one of the provided values.
+
+```ts
+describe('toBeOneOf', ({ test }) => {
+  test('should be one of the values', ({ expect }) => {
+    expect(2).toBeOneOf([1, 2, 3])
+    expect('b').to.be.oneOf(['a', 'b', 'c'])
+  })
+})
+```
+
+# toBeTypeOf
+
+Checks if a value is of a specific type.
+
+```ts
+describe('toBeTypeOf', ({ test }) => {
+  test('should check type of value', ({ expect }) => {
+    expect(1).toBeTypeOf('number') // Ok
+    expect('hello').toBeTypeOf('string') // Ok
+    expect(true).toBeTypeOf('boolean') // Ok
+    expect({}).toBeTypeOf('object') // Ok
+    expect([]).toBeTypeOf('object') // Ok (arrays are objects in JS)
+    expect(undefined).toBeTypeOf('undefined') // Ok
+    expect(() => {}).toBeTypeOf('function') // Ok
+  })
+})
+```
+
+# toBeInstanceOf
+
+Checks if a value is an instance of a given constructor.
+
+```ts
+describe('toBeInstanceOf', ({ test }) => {
+  test('should check instance of array', ({ expect }) => {
+    expect([]).toBeInstanceOf(Array)
+  })
+
+  test('should check instance of object', ({ expect }) => {
+    expect({}).toBeInstanceOf(Object)
+  })
+
+  test('should check instance of class', ({ expect }) => {
+    class Foo {}
+    const foo = new Foo()
+
+    expect(foo).toBeInstanceOf(Foo)
   })
 })
 ```
@@ -178,20 +246,22 @@ describe('rejects', ({ test }) => {
 })
 ```
 
-# haveBeenCalled
+# toHaveLength
 
-Checks if a spied function whether being called or not.
-
-[Learn more about Spy.](/sontuphan/noba/wiki/spy)
+Checks if an object, array, or string has the expected length.
 
 ```ts
-describe('toHaveBeenCalled', ({ test }) => {
-  test('should be called on a spied function', ({ expect }) => {
-    const fn = spy(() => {})
+describe('toHaveLength', ({ test }) => {
+  test('should check length of array', ({ expect }) => {
+    expect([1, 2, 3]).toHaveLength(3)
+  })
 
-    fn()
+  test('should check length of string', ({ expect }) => {
+    expect('hello').toHaveLength(5)
+  })
 
-    expect(fn).toHaveBeenCalled()
+  test('should check length of object with length property', ({ expect }) => {
+    expect({ length: 2 }).toHaveLength(2)
   })
 })
 ```
