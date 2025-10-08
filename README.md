@@ -28,4 +28,4 @@ npx noba ./tests/*.test.js
 
 ## Documentation
 
-[📖 Wiki](https://github.com/sontuphan/noba/wiki)
+📖 [Wiki](https://github.com/sontuphan/noba/wiki)
