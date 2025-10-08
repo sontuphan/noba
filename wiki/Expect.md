@@ -177,3 +177,60 @@ describe('rejects', ({ test }) => {
   })
 })
 ```
+
+# haveBeenCalled
+
+Checks if a spied function whether being called or not.
+
+[Learn more about Spy.](/sontuphan/noba/wiki/spy)
+
+```ts
+describe('toHaveBeenCalled', ({ test }) => {
+  test('should be called on a spied function', ({ expect }) => {
+    const fn = spy(() => {})
+
+    fn()
+
+    expect(fn).toHaveBeenCalled()
+  })
+})
+```
+
+# toHaveBeenCalled
+
+Checks if a spied function whether being called or not.
+
+[Learn more about Spy.](/sontuphan/noba/wiki/spy)
+
+```ts
+describe('toHaveBeenCalled', ({ test }) => {
+  test('should be called on a spied function', ({ expect }) => {
+    const fn = spy(() => {})
+
+    fn()
+
+    expect(fn).toHaveBeenCalled()
+  })
+})
+```
+
+# toHaveBeenCalledWith
+
+Checks if a spied function being called with specific inputs.
+
+[Learn more about Spy.](/sontuphan/noba/wiki/spy)
+
+```ts
+describe('toHaveBeenCalledWith', ({ test }) => {
+  test('should be called with a predefined params on a spied sync function', ({
+    expect,
+  }) => {
+    const fn = spy((..._args: any[]) => {})
+
+    const params = [1, 'a', { b: 2 }]
+    fn(...params)
+
+    expect(fn).toHaveBeenCalledWith(...params)
+  })
+})
+```
