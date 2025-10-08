@@ -34,7 +34,7 @@ describe('shallowMock', async ({ test }) => {
 
 A deep mock replaces not only the directly exported functions or values, but also any nested properties or methods within the module. This is useful when you need to mock complex modules with multiple layers of objects or functions.
 
-Note that `deepMock` won't return a mocked module like `shallowMock`, instead it returns a custom `deepImport` that use can use to import any module that contain the mocked module in its dependency tree.
+Note that unlike `shallowMock`, `deepMock` does not return a mocked module directly. Instead, it provides a custom `deepImport` function, which you use to import any module that depends on the mocked module. This ensures the mock is applied throughout the entire dependency tree.
 
 ```ts
 // ./chart.util.ts
