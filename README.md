@@ -2,7 +2,7 @@
 
 The isometric test framework for javascript/typescript
 
-## Get Started
+## Getting Started
 
 Install
 
