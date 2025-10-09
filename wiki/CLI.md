@@ -1,5 +1,3 @@
-# CLI
-
 ```bash
 noba --help
 noba [flags] <files>
