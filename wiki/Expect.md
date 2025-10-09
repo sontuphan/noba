@@ -23,7 +23,7 @@ describe('toBe', ({ test }) => {
 
 # toEqual
 
-To compare equality of 2 values.
+Checks if two values are deeply equal. For objects and arrays, this means their properties and contents are recursively compared.
 
 ```ts
 describe('toEqual', ({ test }) => {
@@ -234,7 +234,7 @@ describe('throws', ({ test }) => {
 
 # rejects
 
-Checks if an async function rejects.
+Checks whether an asynchronous function returns a rejected promise.
 
 ```ts
 describe('rejects', ({ test }) => {
