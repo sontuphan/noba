@@ -23,6 +23,37 @@ noba -t 3000 ./tests/*.test.js - GOOD
 noba ./tests/*.test.js -t 3000 - BAD
 ```
 
+# Test
+
+```bash
+# Node
+noba ./test/*.test.js
+# Node with coverage
+noba --coverage ./test/*.test.js
+
+# Bare
+noba-bare ./test/*.test.js
+# Bare with coverage
+noba-bare --coverage ./test/*.test.js
+```
+
+## Coverage
+
+To generate coverage in html
+
+```bash
+noba --coverage --coverage-format html ./test/*.test.js
+```
+
+## Typescript
+
+```bash
+# Install the runner (register)
+npm i -D tsx
+# Typescript
+noba --register tsx ./test/*.test.js
+```
+
 # Version
 
 ```bash

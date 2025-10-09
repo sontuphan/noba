@@ -234,7 +234,7 @@ describe('throws', ({ test }) => {
 
 # rejects
 
-Checks whether an asynchronous function returns a rejected promise.
+Checks if an asynchronous function returns a rejected promise.
 
 ```ts
 describe('rejects', ({ test }) => {
