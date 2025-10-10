@@ -1,4 +1,12 @@
+# MacOS
+.DS_Store
+
+# Node
 node_modules
+
+# Source
 /src
+
+# Test
 /tests
 /tmp

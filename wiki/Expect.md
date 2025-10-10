@@ -21,6 +21,19 @@ describe('toBe', ({ test }) => {
 })
 ```
 
+```ts
+describe('not.to.be', ({ test }) => {
+  test('should not be same objects', ({ expect }) => {
+    const a = { a: 1 }
+    const b = { c: 2 }
+    const c = { a: 1 }
+
+    expect<Record<string, number>>(a).not.to.be(b)
+    expect<Record<string, number>>(a).not.to.be(c)
+  })
+})
+```
+
 # toEqual
 
 Checks if two values are deeply equal. For objects and arrays, this means their properties and contents are recursively compared.
@@ -42,6 +55,14 @@ describe('toEqual', ({ test }) => {
 })
 ```
 
+```ts
+describe('not.to.equal', ({ test }) => {
+  test('should differ 2 inequal numbers', ({ expect }) => {
+    expect(1).not.to.equal(2)
+  })
+})
+```
+
 # toBeTruthy
 
 Checks if a value is truthy.
@@ -54,6 +75,19 @@ describe('toBeTruthy', ({ test }) => {
     expect('non-empty').toBeTruthy() // Ok
     expect([]).toBeTruthy() // Ok
     expect({}).toBeTruthy() // Ok
+  })
+})
+```
+
+```ts
+describe('not.to.be.truthy', ({ test }) => {
+  test('should not be truthy', ({ expect }) => {
+    expect('').not.to.be.truthy()
+    expect(0).not.to.be.truthy()
+    expect(0n).not.to.be.truthy()
+    expect(null).not.to.be.truthy()
+    expect(NaN).not.to.be.truthy()
+    expect(undefined).not.to.be.truthy()
   })
 })
 ```
@@ -74,6 +108,17 @@ describe('toBeFalsy', ({ test }) => {
 })
 ```
 
+```ts
+describe('not.to.be.falsy', ({ test }) => {
+  test('should not be falsy', ({ expect }) => {
+    expect('1').not.to.be.falsy()
+    expect(1).not.to.be.falsy()
+    expect([]).not.to.be.falsy()
+    expect({}).not.to.be.falsy()
+  })
+})
+```
+
 # toBeNull
 
 Checks if a value is exactly `null`.
@@ -83,6 +128,15 @@ describe('toBeNull', ({ test }) => {
   test('should be null', ({ expect }) => {
     expect(null).toBeNull()
     expect(null).to.be.null()
+  })
+})
+```
+
+```ts
+describe('not.to.be.null', ({ test }) => {
+  test('should not be null', ({ expect }) => {
+    expect(undefined).not.to.be.null()
+    expect(NaN).not.to.be.null()
   })
 })
 ```
@@ -100,6 +154,15 @@ describe('toBeNaN', ({ test }) => {
 })
 ```
 
+```ts
+describe('not.to.be.nan', ({ test }) => {
+  test('should not be NaN', ({ expect }) => {
+    expect(undefined).not.to.be.nan()
+    expect(null).not.to.be.nan()
+  })
+})
+```
+
 # toBeUndefined
 
 Checks if a value is exactly `undefined`.
@@ -109,6 +172,16 @@ describe('toBeUndefined', ({ test }) => {
   test('should be undefined', ({ expect }) => {
     expect(undefined).toBeUndefined() // Ok
     expect(null).toBeUndefined() // Failed
+  })
+})
+```
+
+```ts
+describe('not.to.be.undefined', ({ test }) => {
+  test('should not be undefined', ({ expect }) => {
+    expect('').not.to.be.undefined()
+    expect(0).not.to.be.undefined()
+    expect(null).not.to.be.undefined()
   })
 })
 ```
@@ -123,6 +196,14 @@ describe('toBeDefined', ({ test }) => {
     expect(1).toBeDefined() // Ok
     expect(null).toBeDefined() // Ok
     expect(undefined).toBeDefined() // Failed
+  })
+})
+```
+
+```ts
+describe('not.to.be.defined', ({ test }) => {
+  test('should not be defined', ({ expect }) => {
+    expect(undefined).not.to.be.defined()
   })
 })
 ```
@@ -144,6 +225,22 @@ describe('toContain', ({ test }) => {
 })
 ```
 
+```ts
+describe('not.to.contain', ({ test }) => {
+  test('should not contain the string', ({ expect }) => {
+    expect('23').not.to.contain('1')
+  })
+
+  test('should not contain the number', ({ expect }) => {
+    expect([2, 3]).not.to.contain(1)
+  })
+
+  test('should not contain the object', ({ expect }) => {
+    expect([{ a: 1 }, { b: 2 }, { c: 3 }]).not.to.contain({ a: 1 })
+  })
+})
+```
+
 # toContainEqual
 
 Checks if an array or string contains a value.
@@ -152,6 +249,22 @@ Checks if an array or string contains a value.
 describe('toContainEqual', ({ test }) => {
   test('should contain object in array', ({ expect }) => {
     expect([{ a: 1 }, { b: 2 }]).toContainEqual({ b: 2 })
+  })
+})
+```
+
+```ts
+describe('not.to.contain.equal', ({ test }) => {
+  test('should not contain the string', ({ expect }) => {
+    expect('23').not.to.containEqual('1')
+  })
+
+  test('should not contain the number', ({ expect }) => {
+    expect([2, 3]).not.to.containEqual(1)
+  })
+
+  test('should not contain the object', ({ expect }) => {
+    expect([{ b: 2 }, { c: 3 }]).not.to.containEqual({ a: 1 })
   })
 })
 ```
@@ -165,6 +278,21 @@ describe('toBeOneOf', ({ test }) => {
   test('should be one of the values', ({ expect }) => {
     expect(2).toBeOneOf([1, 2, 3])
     expect('b').to.be.oneOf(['a', 'b', 'c'])
+  })
+})
+```
+
+```ts
+describe('not.to.be.oneOf', ({ test }) => {
+  test('should not be one of the array', ({ expect }) => {
+    // Number
+    expect(1).not.to.be.oneOf([2, 3])
+    // Object
+    expect<Record<string, number>>({ a: 1 }).not.to.be.oneOf([
+      { a: 1 },
+      { b: 2 },
+      { c: 3 },
+    ])
   })
 })
 ```
@@ -183,6 +311,49 @@ describe('toBeTypeOf', ({ test }) => {
     expect([]).toBeTypeOf('object') // Ok (arrays are objects in JS)
     expect(undefined).toBeTypeOf('undefined') // Ok
     expect(() => {}).toBeTypeOf('function') // Ok
+  })
+})
+```
+
+```ts
+describe('not.to.be.typeOf', ({ test }) => {
+  test('should not be a type of number', ({ expect }) => {
+    expect('1').not.to.be.typeOf('number')
+    expect(1n).not.to.be.typeOf('number')
+    expect({}).not.to.be.typeOf('number')
+    expect([]).not.to.be.typeOf('number')
+    expect(function () {}).not.to.be.typeOf('number')
+  })
+
+  test('should not be a type of string', ({ expect }) => {
+    expect(1).not.to.be.typeOf('string')
+    expect(1n).not.to.be.typeOf('string')
+    expect({}).not.to.be.typeOf('string')
+    expect([]).not.to.be.typeOf('string')
+    expect(function () {}).not.to.be.typeOf('string')
+  })
+
+  test('should not be a type of bigint', ({ expect }) => {
+    expect(1).not.to.be.typeOf('bigint')
+    expect('1').not.to.be.typeOf('bigint')
+    expect({}).not.to.be.typeOf('bigint')
+    expect([]).not.to.be.typeOf('bigint')
+    expect(function () {}).not.to.be.typeOf('bigint')
+  })
+
+  test('should not be a type of object', ({ expect }) => {
+    expect(1).not.to.be.typeOf('object')
+    expect('1').not.to.be.typeOf('object')
+    expect(1n).not.to.be.typeOf('object')
+    expect(function () {}).not.to.be.typeOf('object')
+  })
+
+  test('should not be a type of function', ({ expect }) => {
+    expect(1).not.to.be.typeOf('function')
+    expect('1').not.to.be.typeOf('function')
+    expect(1n).not.to.be.typeOf('function')
+    expect({}).not.to.be.typeOf('function')
+    expect([]).not.to.be.typeOf('function')
   })
 })
 ```
@@ -206,6 +377,18 @@ describe('toBeInstanceOf', ({ test }) => {
     const foo = new Foo()
 
     expect(foo).toBeInstanceOf(Foo)
+  })
+})
+```
+
+```ts
+describe('not.to.be.instanceOf', ({ test }) => {
+  class Foo {}
+  class Bar {}
+
+  test('should be not instance of Foo', ({ expect }) => {
+    const bar = new Bar()
+    expect(bar).not.to.be.instanceOf(Foo)
   })
 })
 ```
