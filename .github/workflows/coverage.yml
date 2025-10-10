@@ -33,7 +33,7 @@ jobs:
       - name: Pretest
         run: npm run pretest
       - name: Test with coverage
-        run: noba --coverage --coverage-format html ./dist/tmp/**/*.test.js
+        run: noba --coverage --coverage-format html ./dist/tests/**/*.test.js
       - name: Publish Coverage Info
         uses: peaceiris/actions-gh-pages@v4
         with:
