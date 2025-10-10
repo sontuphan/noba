@@ -1,0 +1,41 @@
+name: Publish Coverage Info
+
+on:
+  push:
+    branches:
+      - master
+  pull_request:
+    branches:
+      - master
+
+env:
+  NODE_VERSION: 22
+
+permissions:
+  contents: write
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Setup Node ${{ env.NODE_VERSION }}
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+      - name: Install dependencies
+        run: npm install
+      - name: Build & Link
+        run: |
+          npm run build
+          npm link
+          npm link noba
+      - name: Pretest
+        run: npm run pretest
+      - name: Test with coverage
+        run: noba --coverage --coverage-format html ./dist/tmp/**/*.test.js
+      - name: Publish Coverage Info
+        uses: peaceiris/actions-gh-pages@v4
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: ./coverage
