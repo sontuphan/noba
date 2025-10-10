@@ -2,7 +2,6 @@ import { describe } from 'noba'
 
 describe('expect > toBeNaN', ({ test }) => {
   test('should be NaN', ({ expect }) => {
-    expect(NaN).toBeDefined()
     expect(NaN).to.be.nan()
   })
 

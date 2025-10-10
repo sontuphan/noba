@@ -1,4 +1,12 @@
+# Misc
+.DS_Store
+.vscode
+
+# Node
 node_modules
+
+# Source
 /src
-/tests
-/tmp
+
+# Test
+tests

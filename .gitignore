@@ -1,4 +1,12 @@
+# Misc
+.DS_Store
+.vscode
+
+# Node
 node_modules
+
+# Build
 /dist
-/tmp
+
+# Test
 /coverage
