@@ -27,5 +27,5 @@ npm run build
 npm run pretest
 
 # Test
-NOBA_MAIN_ID=0 bare ./dist/tests/*.test.js
+NOBA_MAIN_ID=0 bare ./dist/tests/**/*.test.js
 ```
