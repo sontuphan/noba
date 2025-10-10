@@ -1,3 +1,4 @@
+```bash
 # Link
 npm link
 npm link noba
@@ -6,6 +7,7 @@ npm link noba
 npm run build
 
 # Test Node
-npm run pretest && noba ./tmp/**/*.test.js
+npm run test:node
 # Test Bare
-npm run pretest && noba-bare ./tmp/**/*.test.js
+npm run test:bare
+```

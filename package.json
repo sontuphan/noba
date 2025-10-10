@@ -60,8 +60,10 @@
   "scripts": {
     "prebuild": "rimraf dist",
     "build": "tsup",
-    "pretest": "tsup-node tests --clean --silent --format esm --out-dir tmp",
-    "test": "NOBA_MAIN_ID=0 bare ./tmp/**/*.test.js",
+    "pretest": "tsup-node tests --clean --silent --format esm --out-dir dist/tests",
+    "test": "npm run test:node",
+    "test:node": "noba ./dist/tests/**/*.test.js",
+    "test:bare": "noba-bare ./dist/tests/**/*.test.js",
     "ci:release": "semantic-release"
   },
   "keywords": [

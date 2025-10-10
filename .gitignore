@@ -1,5 +1,6 @@
-# MacOS
+# Misc
 .DS_Store
+.vscode
 
 # Node
 node_modules
@@ -8,5 +9,4 @@ node_modules
 /dist
 
 # Test
-/tmp
 /coverage
