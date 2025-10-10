@@ -61,8 +61,8 @@
     "prebuild": "rimraf dist",
     "build": "tsup",
     "pretest": "tsup-node tests --clean --silent --format esm --out-dir dist/tests",
-    "test": "npm run test:node",
-    "test:node": "noba ./dist/tests/**/*.test.js",
+    "test": "noba ./dist/tests/**/*.test.js",
+    "pretest:bare": "npm run pretest",
     "test:bare": "noba-bare ./dist/tests/**/*.test.js",
     "ci:release": "semantic-release"
   },

@@ -127,6 +127,74 @@ describe('isNotOk', ({ test }) => {
 })
 ```
 
+# isTrue, isNotTrue
+
+Checks if a value is true.
+
+```ts
+describe('isTrue', ({ test }) => {
+  test('should be true', ({ assert }) => {
+    assert.isTrue(true)
+  })
+})
+```
+
+```ts
+describe('isNotTrue', ({ test }) => {
+  test('should not be true', ({ assert }) => {
+    assert.isNotTrue(false)
+    assert.isNotTrue(0)
+    assert.isNotTrue('')
+  })
+})
+```
+
+# isFalse, isNotFalse
+
+Checks if a value is false.
+
+```ts
+describe('isFalse', ({ test }) => {
+  test('should be false', ({ assert }) => {
+    assert.isFalse(false)
+  })
+})
+```
+
+```ts
+describe('isNotFalse', ({ test }) => {
+  test('should not be false', ({ assert }) => {
+    assert.isNotFalse(true)
+    assert.isNotFalse(0)
+    assert.isNotFalse('')
+  })
+})
+```
+
+# isExist, isNotExist
+
+Checks if a value is not null and undefined.
+
+```ts
+describe('isExist', ({ test }) => {
+  test('should be exist', ({ assert }) => {
+    assert.isExist(true)
+    assert.isExist(false)
+    assert.isExist(0)
+    assert.isExist('')
+  })
+})
+```
+
+```ts
+describe('isNotExist', ({ test }) => {
+  test('should not be true', ({ assert }) => {
+    assert.isNotExist(null)
+    assert.isNotExist(undefined)
+  })
+})
+```
+
 # instanceOf, notInstanceOf
 
 Checks if a value is an instance of a specified constructor. For type narrowing, use an `if` statement with `assert.instanceOf`.
