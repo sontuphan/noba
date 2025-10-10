@@ -1,6 +1,6 @@
 import { describe } from 'noba'
 
-describe('assert.isOk', ({ test }) => {
+describe('assert > ok', ({ test }) => {
   test('should be a truthy value', ({ assert }) => {
     assert.isOk(1)
     assert.isOk('1')

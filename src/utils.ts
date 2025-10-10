@@ -1,21 +1,48 @@
+import process from 'process'
 import type { Func } from './types/generic'
+import type { Runtime } from './types/runtime'
 
-export const uuid = () => {
-  return Math.round(Math.random() * 10 ** 12).toString()
+/**
+ * Pseudo-unique id
+ * @param length (Optional) The length of id (default: 12)
+ * @returns uuid
+ */
+export const uuid = (length = 12) => {
+  if (length <= 0) return ''
+  let uid = ''
+  while (uid.length < length) {
+    const num = Math.round(Math.random() * 10)
+    if (!uid && !num) continue
+    uid = uid + num.toString()
+  }
+  return uid
 }
 
+/**
+ * Async delay
+ * @param ms - Milliseconds
+ * @returns
+ */
 export const delay = (ms: number) => {
   return new Promise((resolve) => setTimeout(resolve, ms))
 }
 
+/**
+ * Color constants
+ */
 export const colors = {
   none: '\x1b[0m',
   red: '\x1b[31m',
   green: '\x1b[32m',
   yellow: '\x1b[33m',
   blue: '\x1b[34m',
+  purple: '\x1b[35m',
 }
 
+/**
+ * The timer calculation
+ * @returns Milliseconds
+ */
 export const timer = () => {
   const start = Date.now()
   return () => {
@@ -31,6 +58,13 @@ export const timer = () => {
   }
 }
 
+/**
+ * Race an async
+ * @param fn An async function
+ * @param ms Time limit
+ * @param er Time limit exception message
+ * @returns
+ */
 export const race = async <T>(fn: Func<void, T>, ms: number, er: string) => {
   let id: NodeJS.Timeout
 
@@ -40,4 +74,23 @@ export const race = async <T>(fn: Func<void, T>, ms: number, er: string) => {
       (_, reject) => (id = setTimeout(() => reject(new Error(er)), ms)),
     ),
   ]).finally(() => clearTimeout(id))
+}
+
+/**
+ * Detect the current runtime
+ * @returns Runtime
+ */
+export const detectRuntime = (): Runtime | '' => {
+  if (process.versions) {
+    if (process.versions.bun) return 'bun'
+    if (process.versions.bare) return 'bare'
+    if (process.versions.node) return 'node'
+  }
+
+  if (typeof Deno !== 'undefined' && typeof Deno.version !== 'undefined')
+    return 'deno'
+  if (typeof Bun !== 'undefined') return 'bun'
+  if (typeof Bare !== 'undefined') return 'bare'
+
+  return ''
 }

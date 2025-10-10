@@ -47,12 +47,25 @@ export default class Runner {
   private readonly reporter: Reporter
 
   private jobs: Array<Job> = []
+  private queued: boolean = false
 
-  private beforeAlls: Array<Func<HookParams['beforeAll'], any>> = []
-  private afterAlls: Array<Func<HookParams['afterAll'], any>> = []
+  private beforeAlls: Array<{
+    cb: Func<HookParams['beforeAll'], any>
+    timeout?: number
+  }> = []
+  private afterAlls: Array<{
+    cb: Func<HookParams['afterAll'], any>
+    timeout?: number
+  }> = []
 
-  private beforeEachs: Array<Func<HookParams['beforeEach'], any>> = []
-  private afterEachs: Array<Func<HookParams['afterEach'], any>> = []
+  private beforeEachs: Array<{
+    cb: Func<HookParams['beforeEach'], any>
+    timeout?: number
+  }> = []
+  private afterEachs: Array<{
+    cb: Func<HookParams['afterEach'], any>
+    timeout?: number
+  }> = []
 
   constructor(
     private readonly id: string,
@@ -62,23 +75,6 @@ export default class Runner {
   ) {
     // This instance is created once in main and passed around
     this.reporter = reporter || new Reporter(this.id)
-
-    if (this.isMain) {
-      process.nextTick(async () => {
-        // Setup
-        const handleUncaughtException = (er: any) => {
-          this.reporter.catch('Uncaught Exception', er)
-        }
-        process.on('uncaughtException', handleUncaughtException)
-        // Run the tree of tests
-        await this.run()
-        // Emit the report
-        this.reporter.report()
-        // Teardown
-        process.off('uncaughtException', handleUncaughtException)
-        return process.exit(0)
-      })
-    }
   }
 
   get isMain() {
@@ -86,15 +82,47 @@ export default class Runner {
   }
 
   run = async () => {
-    await this.runBeforeAll()
+    try {
+      await this.runBeforeAll()
+    } catch (er) {
+      this.reporter.uncatch('beforeAll', er)
+    }
 
     for (const { type, description, cb } of this.jobs) {
       if (type === 'describe') await this.runDescribe(description, cb)
-      else if (type === 'test') await this.runTest(description, cb)
-      else throw new Error('Invalid job.')
+      if (type === 'test') await this.runTest(description, cb)
     }
 
-    await this.runAfterAll()
+    try {
+      await this.runAfterAll()
+    } catch (er) {
+      this.reporter.uncatch('afterAll', er)
+    }
+  }
+
+  private plan = () => {
+    if (!this.isMain || this.queued) return
+
+    this.queued = true
+
+    return queueMicrotask(async () => {
+      // Setup
+      const handleUncaughtException = (er: any) => {
+        this.reporter.catch('Uncaught Exception', er)
+      }
+      const handleUnhandledRejection = (er: any) => {
+        this.reporter.catch('Unhandled Rejection', er)
+      }
+      process.on('uncaughtException', handleUncaughtException)
+      process.on('unhandledRejection', handleUnhandledRejection)
+      // Run the tree of tests
+      await this.run()
+      // Emit the report
+      this.reporter.report()
+      // Teardown
+      process.off('uncaughtException', handleUncaughtException)
+      process.off('unhandledRejection', handleUnhandledRejection)
+    })
   }
 
   /**
@@ -105,11 +133,14 @@ export default class Runner {
     description: string,
     cb: Func<CallbackParams['describe'], T> = () => {},
   ) => {
+    // Register the job
     this.jobs.push({
       type: 'describe',
       description,
       cb,
     })
+    // Register the master plan
+    this.plan()
   }
 
   private runDescribe = async <T>(
@@ -121,16 +152,21 @@ export default class Runner {
 
     const runner = new Runner(uuid(), this.timeout, this, this.reporter)
 
-    await cb({
-      log: runner.reporter.log,
-      describe: runner.describe,
-      test: runner.test,
-      it: runner.it,
-      beforeEach: runner.beforeEach,
-      afterEach: runner.afterEach,
-      beforeAll: runner.beforeAll,
-      afterAll: runner.afterAll,
-    })
+    try {
+      await cb({
+        log: runner.reporter.log,
+        describe: runner.describe,
+        test: runner.test,
+        it: runner.it,
+        beforeEach: runner.beforeEach,
+        afterEach: runner.afterEach,
+        beforeAll: runner.beforeAll,
+        afterAll: runner.afterAll,
+      })
+    } catch (er) {
+      this.reporter.uncatch(description, er)
+    }
+
     await runner.run()
 
     groupEnd()
@@ -144,24 +180,31 @@ export default class Runner {
     description: string,
     cb: Func<CallbackParams['test'], T> = () => {},
   ) => {
+    // Register the job
     this.jobs.push({
       type: 'test',
       description,
       cb,
     })
+    // Register the master plan
+    this.plan()
   }
 
   private runTest = async <T>(
     description: string,
     cb: Func<CallbackParams['test'], T> = () => {},
   ) => {
-    await this.runBeforeEach()
+    try {
+      await this.runBeforeEach()
+    } catch (er) {
+      this.reporter.uncatch('beforeEach', er)
+    }
 
     const groupEnd = this.reporter.group()
     const timerEnd = timer()
 
     try {
-      const expect = <T>(value: T) => new Expect(value, this.reporter)
+      const expect = <A>(value: A) => new Expect(value, this.reporter)
       const assert = new Assert(this.reporter)
 
       await race(
@@ -182,7 +225,11 @@ export default class Runner {
       this.reporter.catch(description, er)
     }
 
-    await this.runAfterEach()
+    try {
+      await this.runAfterEach()
+    } catch (er) {
+      this.reporter.uncatch('afterEach', er)
+    }
   }
 
   /**
@@ -195,13 +242,19 @@ export default class Runner {
    * Before all
    */
 
-  beforeAll = (cb?: Func<HookParams['beforeAll'], any>) => {
-    if (cb) this.beforeAlls.push(cb)
+  beforeAll = (cb?: Func<HookParams['beforeAll'], any>, timeout?: number) => {
+    if (cb) this.beforeAlls.push({ cb, timeout })
   }
 
   private runBeforeAll = async () => {
-    for (const cb of this.beforeAlls) {
-      await cb({ log: this.reporter.log })
+    for (const { cb, timeout } of this.beforeAlls) {
+      if (!timeout) await cb({ log: this.reporter.log })
+      else
+        await race(
+          async () => await cb({ log: this.reporter.log }),
+          timeout,
+          `Cannot complete beforeAll in ${timeout}ms.`,
+        )
     }
   }
 
@@ -209,13 +262,19 @@ export default class Runner {
    * After all
    */
 
-  afterAll = (cb?: Func<HookParams['afterAll'], any>) => {
-    if (cb) this.afterAlls.push(cb)
+  afterAll = (cb?: Func<HookParams['afterAll'], any>, timeout?: number) => {
+    if (cb) this.afterAlls.push({ cb, timeout })
   }
 
   private runAfterAll = async () => {
-    for (const cb of this.afterAlls) {
-      await cb({ log: this.reporter.log })
+    for (const { cb, timeout } of this.afterAlls) {
+      if (!timeout) await cb({ log: this.reporter.log })
+      else
+        await race(
+          async () => await cb({ log: this.reporter.log }),
+          timeout,
+          `Cannot complete afterAll in ${timeout}ms.`,
+        )
     }
   }
 
@@ -223,14 +282,20 @@ export default class Runner {
    * Before each
    */
 
-  beforeEach = (cb?: Func<HookParams['beforeEach'], any>) => {
-    if (cb) this.beforeEachs.push(cb)
+  beforeEach = (cb?: Func<HookParams['beforeEach'], any>, timeout?: number) => {
+    if (cb) this.beforeEachs.push({ cb, timeout })
   }
 
   runBeforeEach = async () => {
     await this.parent?.runBeforeEach()
-    for (const cb of this.beforeEachs) {
-      await cb({ log: this.reporter.log })
+    for (const { cb, timeout } of this.beforeEachs) {
+      if (!timeout) await cb({ log: this.reporter.log })
+      else
+        await race(
+          async () => await cb({ log: this.reporter.log }),
+          timeout,
+          `Cannot complete afterAll in ${timeout}ms.`,
+        )
     }
   }
 
@@ -238,14 +303,20 @@ export default class Runner {
    * After each
    */
 
-  afterEach = (cb?: Func<HookParams['afterEach'], any>) => {
-    if (cb) this.afterEachs.push(cb)
+  afterEach = (cb?: Func<HookParams['afterEach'], any>, timeout?: number) => {
+    if (cb) this.afterEachs.push({ cb, timeout })
   }
 
   runAfterEach = async () => {
     await this.parent?.runAfterEach()
-    for (const cb of this.afterEachs) {
-      await cb({ log: this.reporter.log })
+    for (const { cb, timeout } of this.afterEachs) {
+      if (!timeout) await cb({ log: this.reporter.log })
+      else
+        await race(
+          async () => await cb({ log: this.reporter.log }),
+          timeout,
+          `Cannot complete afterAll in ${timeout}ms.`,
+        )
     }
   }
 }

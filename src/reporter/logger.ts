@@ -15,8 +15,7 @@ export default class Logger {
 
     return () => {
       const index = this.groupIds.findIndex((i) => i === id)
-      if (index < 0) throw new Error('The group is already closed.')
-      this.groupIds.splice(index)
+      if (index >= 0) this.groupIds.splice(index)
     }
   }
 
@@ -38,5 +37,9 @@ export default class Logger {
 
   blue = (msg: any = '', ...args: any[]) => {
     this.log(`${colors.blue}${msg}`, ...args, colors.none)
+  }
+
+  purple = (msg: any = '', ...args: any[]) => {
+    this.log(`${colors.purple}${msg}`, ...args, colors.none)
   }
 }

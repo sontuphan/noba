@@ -1,6 +1,6 @@
 import { describe } from 'noba'
 
-describe('assert.null', ({ test }) => {
+describe('assert > null', ({ test }) => {
   test('should be null', ({ assert }) => {
     assert.isNull(null)
   })

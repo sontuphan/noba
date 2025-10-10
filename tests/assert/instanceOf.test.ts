@@ -1,6 +1,6 @@
 import { describe } from 'noba'
 
-describe('instance of', ({ test }) => {
+describe('assert > instance of', ({ test }) => {
   class Foo {}
   class Bar {}
 

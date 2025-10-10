@@ -2,13 +2,30 @@
 
 The isometric test framework for javascript/typescript
 
-## Develop
+## Getting Started
+
+Install
 
 ```bash
-# Link
-npm link
-# Test
-npm run pretest && noba-bare ./tmp/*.test.js
-# If you machine had installed clearz
-# npm run pretest && clearz && noba-bare ./tmp/*.test.js
+npm i -D noba
 ```
+
+In `tests`, create `unit.test.js`
+
+```js
+import { describe } from 'noba'
+
+describe('sum', ({ test }) => {
+  test('should add 1 and 1', ({ assert }) => {
+    assert.equal(1 + 1, 2)
+  })
+})
+```
+
+```bash
+npx noba ./tests/*.test.js
+```
+
+## Documentation
+
+📖 [Wiki](https://github.com/sontuphan/noba/wiki)
