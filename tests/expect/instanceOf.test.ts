@@ -4,6 +4,14 @@ describe('expect > toBeInstanceOf', ({ test }) => {
   class Foo {}
   class Bar {}
 
+  test('should be instance of array', ({ expect }) => {
+    expect([]).toBeInstanceOf(Array)
+  })
+
+  test('should be instance of object', ({ expect }) => {
+    expect({}).toBeInstanceOf(Object)
+  })
+
   test('should be instance of Foo', ({ expect }) => {
     const foo: any = new Foo()
     expect(foo).to.be.instanceOf(Foo)

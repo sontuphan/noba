@@ -32,12 +32,10 @@ jobs:
           npm run build
           npm link
           npm link noba
-      - name: Pretest
-        run: npm run pretest
       - name: Test in Node
-        run: noba ./tmp/**/*.test.js
+        run: npm test
       - name: Test in Bare
-        run: noba-bare ./tmp/**/*.test.js
+        run: npm run test:bare
   release:
     if: github.event_name == 'push' || github.event.pull_request.merged == true
     needs: test
