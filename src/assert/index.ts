@@ -4,7 +4,8 @@ export default class Assert {
   constructor(private readonly reporter: Reporter) {}
 
   private expect = <A, E>(actual: A, verb: string, expect: E) => {
-    this.reporter.green('- Expected:', expect)
+    const not = verb.startsWith('not')
+    this.reporter.green(!not ? '- Expected:' : '- Unexpected:', expect)
     this.reporter.red('- Received:', actual)
 
     return `Expect ${actual} ${verb} ${expect}.`
