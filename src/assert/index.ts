@@ -204,25 +204,24 @@ export default class Assert {
     } catch (error: any) {
       if (!error || !error.message) return false
       if (typeof message === 'string') return error.message.includes(message)
-      if (message instanceof RegExp) return message.test(error?.message)
-      return false
+      return message.test(error?.message)
     }
   }
 
-  throws = (fn: () => void, message: string | RegExp, msg?: string) => {
-    if (this._throws(fn, message)) return true
+  throws = (fn: () => void, error: string | RegExp, msg?: string) => {
+    if (this._throws(fn, error)) return true
     throw new Error(
       msg ||
         this.expect(
           'the function',
           'to throw',
-          `an error with message sastifying ${msg}`,
+          `an error with message sastifying ${error}`,
         ),
     )
   }
 
-  doesNotThrow = (fn: () => void, message: string | RegExp, msg?: string) => {
-    if (!this._throws(fn, message)) return true
+  doesNotThrow = (fn: () => void, error: string | RegExp, msg?: string) => {
+    if (!this._throws(fn, error)) return true
     throw new Error(
       msg ||
         this.expect(
