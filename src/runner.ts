@@ -17,6 +17,7 @@ export type CallbackParams = {
       | 'describe'
       | 'test'
       | 'it'
+      | 'each'
       | 'beforeEach'
       | 'afterEach'
       | 'beforeAll'
@@ -26,6 +27,8 @@ export type CallbackParams = {
     expect: <T>(value: T) => InstanceType<typeof Expect<T>>
     assert: InstanceType<typeof Assert>
   }
+  each: BaseCallbackParams &
+    Pick<InstanceType<typeof Runner>, 'describe' | 'test' | 'it'>
 }
 
 export type HookParams = {
@@ -129,9 +132,9 @@ export default class Runner {
    * Describe block
    */
 
-  describe = <T>(
+  describe = <O>(
     description: string,
-    cb: Func<CallbackParams['describe'], T> = () => {},
+    cb: Func<CallbackParams['describe'], O> = () => {},
   ) => {
     // Register the job
     this.jobs.push({
@@ -143,9 +146,9 @@ export default class Runner {
     this.plan()
   }
 
-  private runDescribe = async <T>(
+  private runDescribe = async <O>(
     description: string,
-    cb: Func<CallbackParams['describe'], T> = () => {},
+    cb: Func<CallbackParams['describe'], O> = () => {},
   ) => {
     this.reporter.blue(description)
     const groupEnd = this.reporter.group()
@@ -158,6 +161,7 @@ export default class Runner {
         describe: runner.describe,
         test: runner.test,
         it: runner.it,
+        each: runner.each,
         beforeEach: runner.beforeEach,
         afterEach: runner.afterEach,
         beforeAll: runner.beforeAll,
@@ -176,9 +180,9 @@ export default class Runner {
    * Test block
    */
 
-  test = <T>(
+  test = <O>(
     description: string,
-    cb: Func<CallbackParams['test'], T> = () => {},
+    cb: Func<CallbackParams['test'], O> = () => {},
   ) => {
     // Register the job
     this.jobs.push({
@@ -190,9 +194,9 @@ export default class Runner {
     this.plan()
   }
 
-  private runTest = async <T>(
+  private runTest = async <O>(
     description: string,
-    cb: Func<CallbackParams['test'], T> = () => {},
+    cb: Func<CallbackParams['test'], O> = () => {},
   ) => {
     try {
       await this.runBeforeEach()
@@ -237,6 +241,25 @@ export default class Runner {
    */
 
   it = this.test
+
+  /**
+   * Each block
+   */
+
+  each = async <T, O>(
+    args: Array<T>,
+    cb: Func<CallbackParams['each'] & { arg: T }, O> = () => {},
+  ) => {
+    for (const arg of args) {
+      await cb({
+        log: this.reporter.log,
+        describe: this.describe,
+        test: this.test,
+        it: this.it,
+        arg,
+      })
+    }
+  }
 
   /**
    * Before all

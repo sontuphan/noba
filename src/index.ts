@@ -37,7 +37,7 @@ if (!!process.env.NOBA_BARE_COVERAGE) {
  * Noba modules
  */
 export * from './utils'
-export const { describe, test, it } = new Runner(
+export const { describe, test, it, each } = new Runner(
   process.env.NOBA_MAIN_ID,
   Number(process.env.NOBA_TIMEOUT) || undefined,
 )
