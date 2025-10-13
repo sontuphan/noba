@@ -16,20 +16,6 @@ setup()
 noba --globalSetup ./test/globals/setup.js
 ```
 
-## With custom runner
-
-For example, a typescript setup
-
-```ts
-// ./test/globals/setup.ts
-
-const setup = async () => {
-  console.log('Typescript Global Setup')
-}
-
-setup()
-```
-
 ```bash
 npm i -g tsx
 noba --register tsx --globalSetup ./test/globals/setup.ts
@@ -50,12 +36,22 @@ teardown()
 ```
 
 ```bash
-noba --globalSetup ./test/globals/teardown.js
+noba --globalTeardown ./test/globals/teardown.js
 ```
 
-## With custom runner
+# With custom runner
 
-For example, a typescript teardown
+For example, a typescript setup & teardown.
+
+```ts
+// ./test/globals/setup.ts
+
+const setup = () => {
+  console.log('Typescript Global Setup')
+}
+
+setup()
+```
 
 ```ts
 // ./test/globals/teardown.ts
@@ -69,5 +65,5 @@ teardown()
 
 ```bash
 npm i -g tsx
-noba --register tsx --globalSetup ./test/globals/teardown.ts
+noba --register tsx --globalSetup ./test/globals/setup.ts --globalTeardown ./test/globals/teardown.ts
 ```
