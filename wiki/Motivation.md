@@ -226,8 +226,3 @@ Maintaining feature parity across runtimes is complex and an ongoing effort. For
 ### Maintenance Burden
 
 Supporting multiple runtimes increases the framework's maintenance complexity.
-
-## Future work
-
-1. Unify the mocking API
-2. Integrate a mature asserter (e.g. chai)

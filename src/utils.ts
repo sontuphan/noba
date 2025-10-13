@@ -11,9 +11,8 @@ export const uuid = (length = 12) => {
   if (length <= 0) return ''
   let uid = ''
   while (uid.length < length) {
-    const num = Math.round(Math.random() * 10)
-    if (!uid && !num) continue
-    uid = uid + num.toString()
+    const num = Math.floor(Math.random() * 10)
+    if (uid || num) uid = uid + num.toString()
   }
   return uid
 }
