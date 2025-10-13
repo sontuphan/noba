@@ -39,6 +39,8 @@ describe('parent', ({ describe, test }) => {
 
 # test
 
+> alias `it`
+
 `test` specifies what behavior you `expect` (or `assert`) and verifies it.
 
 ```ts
@@ -101,6 +103,148 @@ describe('main', ({ each }) => {
     test(`should be defined #${arg}`, ({ expect }) => {
       expect(arg).to.be.defined()
     })
+  })
+})
+```
+
+# beforeAll
+
+`beforeAll` runs a setup function once before all tests in the current `describe` block.
+
+## API
+
+```ts
+beforeAll(({ log }) => {
+  // setup code
+})
+```
+
+## Example
+
+```ts
+import { describe } from 'noba'
+
+describe('main', ({ beforeAll, test }) => {
+  let db
+
+  beforeAll(async () => {
+    db = await connectToDatabase()
+  })
+
+  test('db is connected', ({ expect }) => {
+    expect(db.connection).to.be.defined()
+  })
+})
+```
+
+# afterAll
+
+`afterAll` runs a teardown function once after all tests in the current `describe` block.
+
+## API
+
+```ts
+afterAll(({ log }) => {
+  // teardown code
+})
+```
+
+## Example
+
+```ts
+import { describe } from 'noba'
+
+describe('suite', ({ afterAll, test }) => {
+  let db
+
+  afterAll(() => {
+    if (db) db.disconnect()
+  })
+
+  test('dummy test', ({ expect }) => {
+    expect(db.connection).to.be.undefined()
+  })
+})
+```
+
+# beforeEach
+
+`beforeEach` runs a setup function before each `test` in the current `describe` block.
+
+## API
+
+```ts
+beforeEach(({ log }) => {
+  // setup code before each test
+})
+```
+
+## Example
+
+```ts
+import { describe } from 'noba'
+
+describe('suite', ({ beforeEach, test }) => {
+  let value
+
+  beforeEach(() => {
+    value = 1
+  })
+
+  test('should set the value', ({ expect }) => {
+    expect(value).to.equal(1)
+  })
+})
+```
+
+# afterEach
+
+`afterEach` runs a teardown function after each `test` in the current `describe` block.
+
+## API
+
+```ts
+afterEach(({ log }) => {
+  // teardown code after each test
+})
+```
+
+## Example
+
+```ts
+import { describe } from 'noba'
+
+describe('suite', ({ afterEach, test }) => {
+  let value = 100
+
+  afterEach(() => {
+    value = null
+  })
+
+  test('should set the value', ({ expect }) => {
+    expect(value).to.equal(100)
+  })
+})
+```
+
+# log
+
+The `log` utility provides a way to output messages during test execution, which can help with debugging or providing additional context.
+
+## API
+
+```ts
+log('message')
+```
+
+## Example
+
+```ts
+import { describe } from 'noba'
+
+describe('logging example', ({ test, log }) => {
+  test('should log a message', () => {
+    log('This is a log message inside the test')
   })
 })
 ```
