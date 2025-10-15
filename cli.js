@@ -45,11 +45,13 @@ const cmd = command(
       '-t 3000 - BAD',
     )}`,
   ),
+  // Timeout
   flag(
     '--timeout|-t <timeout>',
     'Set the test timeout in milliseconds (default: 10000)',
   ),
   flag('--version|-v', 'Show the noba version'),
+  // Coverage
   flag('--coverage|-c', 'Enable the test coverage'),
   flag(
     '--coverage-dir <directory>',
@@ -59,9 +61,19 @@ const cmd = command(
     '--coverage-format <text|html>',
     'Set the coverage format for the result (default: text)',
   ),
+  // Register
   flag(
     '--register|-r <runner>',
     'Override the default runner. For example, --register tsx to run tests in typescript.',
+  ),
+  // Setup & Teardown
+  flag(
+    '--globalSetup <file>',
+    'Run a custom setup once before all test suites.',
+  ),
+  flag(
+    '--globalTeardown <file>',
+    'Run a custom teardown once after all test suites.',
   ),
   rest(green('<files>')),
 ).parse(args)
@@ -74,7 +86,9 @@ const runtime = detectRuntime()
 
 if (!runtime || !cmd) process.exit(1)
 
-const NOBA_MAIN_ID = Math.round(Math.random() * 10 ** 12).toString()
+let NOBA_MAIN_ID = Math.round(Math.random() * 10 ** 12).toString()
+while (NOBA_MAIN_ID.length !== 12) {}
+
 const {
   flags: {
     timeout: NOBA_TIMEOUT = 10000,
@@ -83,6 +97,8 @@ const {
     coverageDir = './coverage',
     coverageFormat = 'text',
     register,
+    globalSetup,
+    globalTeardown,
   },
 } = cmd
 
@@ -102,6 +118,9 @@ if (version) {
 if (coverage) {
   rmSync(coverageTmp, { recursive: true, force: true })
 }
+
+// Executer
+const exec = register ? `./node_modules/.bin/${register}` : runtime
 
 /**
  * Spawn a child process
@@ -162,7 +181,6 @@ const spawnAsync = (file) => {
       if (runtime === 'bare') env.NOBA_BARE_COVERAGE = coverageTmp
     }
 
-    const exec = register ? `./node_modules/.bin/${register}` : runtime
     const child = spawn(exec, [file], { env })
 
     child.on('exit', (code) => (!code ? resolve(result) : reject()))
@@ -179,6 +197,34 @@ const spawnAsync = (file) => {
  * Main
  */
 
+const setup = (file) => {
+  const { status } = spawnSync(exec, [file], {
+    env: {
+      ...process.env,
+      NOBA_TIMEOUT,
+      NOBA_MAIN_ID,
+    },
+    stdio: 'inherit',
+    shell: true,
+  })
+
+  if (status === 1) process.exit(1)
+}
+
+const teardown = (file) => {
+  const { status } = spawnSync(exec, [file], {
+    env: {
+      ...process.env,
+      NOBA_TIMEOUT,
+      NOBA_MAIN_ID,
+    },
+    stdio: 'inherit',
+    shell: true,
+  })
+
+  if (status === 1) process.exit(1)
+}
+
 ;(async () => {
   let errors = []
 
@@ -188,6 +234,8 @@ const spawnAsync = (file) => {
   let exception = 0
 
   const start = Date.now()
+
+  if (globalSetup) setup(globalSetup)
 
   for (const file of files) {
     const re = await spawnAsync(file)
@@ -200,7 +248,9 @@ const spawnAsync = (file) => {
     exception += re.summary.exception
   }
 
-  const end = Date.now() - start
+  if (globalTeardown) teardown(globalTeardown)
+
+  const end = Date.now()
 
   for (const error of errors) {
     console.error(error)
@@ -212,7 +262,7 @@ const spawnAsync = (file) => {
     `Run total`,
     blue(`${total} ${total > 1 ? 'tests' : 'test'}`),
     'in',
-    blue(`${end / 1000}s:`),
+    blue(`${(end - start) / 1000}s:`),
     '\n',
     (success > 0 ? green : gray)(
       `- ${success}\t${success > 1 ? 'successes' : 'success'}`,

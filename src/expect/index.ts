@@ -14,7 +14,7 @@ export default class Expect<A> {
   }
 
   private expect = <E>(verb: string, expect: E) => {
-    this.reporter.green('- Expected:', expect)
+    this.reporter.green(!this.not ? '- Expected:' : '- Unexpected', expect)
     this.reporter.red('- Received:', this.actual)
 
     return `Expect ${this.actual} ${verb} ${expect}.`
