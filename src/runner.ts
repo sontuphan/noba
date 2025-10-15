@@ -51,6 +51,7 @@ export default class Runner {
 
   private jobs: Array<Job> = []
   private queued: boolean = false
+  private locked: boolean = false
 
   private beforeAlls: Array<{
     cb: Func<HookParams['beforeAll'], any>
@@ -132,19 +133,53 @@ export default class Runner {
    * Describe block
    */
 
-  describe = <O>(
-    description: string,
-    cb: Func<CallbackParams['describe'], O> = () => {},
-  ) => {
-    // Register the job
-    this.jobs.push({
-      type: 'describe',
-      description,
-      cb,
-    })
-    // Register the master plan
-    this.plan()
-  }
+  describe = (() => {
+    // Main
+    const describe = <O>(
+      description: string,
+      cb: Func<CallbackParams['describe'], O> = () => {},
+    ) => {
+      // The job list is locked
+      if (this.locked) return
+      // Register the job
+      this.jobs.push({
+        type: 'describe',
+        description,
+        cb,
+      })
+      // Register the master plan
+      this.plan()
+    }
+
+    // Only
+    describe.only = <O>(
+      description: string,
+      cb: Func<CallbackParams['describe'], O> = () => {},
+    ) => {
+      // Lock the job list
+      this.locked = true
+      // Assign an only task
+      this.jobs = [
+        {
+          type: 'describe',
+          description,
+          cb,
+        },
+      ]
+      // Register the master plan
+      this.plan()
+    }
+
+    // Skip
+    describe.skip = <O>(
+      _description: string,
+      _cb: Func<CallbackParams['describe'], O> = () => {},
+    ) => {
+      // Ignore
+    }
+
+    return describe
+  })()
 
   private runDescribe = async <O>(
     description: string,
@@ -180,19 +215,53 @@ export default class Runner {
    * Test block
    */
 
-  test = <O>(
-    description: string,
-    cb: Func<CallbackParams['test'], O> = () => {},
-  ) => {
-    // Register the job
-    this.jobs.push({
-      type: 'test',
-      description,
-      cb,
-    })
-    // Register the master plan
-    this.plan()
-  }
+  test = (() => {
+    // Main
+    const test = <O>(
+      description: string,
+      cb: Func<CallbackParams['test'], O> = () => {},
+    ) => {
+      // The job list is locked
+      if (this.locked) return
+      // Register the job
+      this.jobs.push({
+        type: 'test',
+        description,
+        cb,
+      })
+      // Register the master plan
+      this.plan()
+    }
+
+    // Only
+    test.only = <O>(
+      description: string,
+      cb: Func<CallbackParams['test'], O> = () => {},
+    ) => {
+      // Lock the job list
+      this.locked = true
+      // Register the job
+      this.jobs = [
+        {
+          type: 'test',
+          description,
+          cb,
+        },
+      ]
+      // Register the master plan
+      this.plan()
+    }
+
+    // Skip
+    test.skip = <O>(
+      _description: string,
+      _cb: Func<CallbackParams['test'], O> = () => {},
+    ) => {
+      // Ignore
+    }
+
+    return test
+  })()
 
   private runTest = async <O>(
     description: string,
