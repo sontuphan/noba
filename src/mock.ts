@@ -32,13 +32,12 @@ const _bareMock = async <T extends MockObject>(
 
   // @ts-ignore
   const { Addon } = await import('bare')
-  const { exports } = Addon.load(
-    Addon.resolve(
-      Object.keys(Addon.cache).find((m) =>
-        /^builtin:bare-module@[A-Za-z0-9._-]+$/.test(m),
-      ),
-      import.meta.url,
-    ),
+  const builtin = Object.keys(Addon.cache).find((m) =>
+    /^builtin:bare-module@[A-Za-z0-9._-]+$/.test(m),
+  )
+  if (!builtin) throw new Error('Cannot find `builtin:bare-module`')
+  const { exports }: any = Addon.load(
+    Addon.resolve(builtin, new URL(import.meta.url)),
   )
 
   const resolved = Module.resolve(specifier, new URL(parent))
@@ -61,6 +60,7 @@ const _bareMock = async <T extends MockObject>(
   ) {
     const namespace = _createSyntheticModule(url, ...args)
     if (url === resolved.href) target = namespace
+
     return namespace
   }
 
@@ -139,7 +139,9 @@ const _bareMock = async <T extends MockObject>(
     unknown: any,
     buffer: any,
   ) {
-    if (url === resolved.href) source = wrapExports(url, source, mocks)
+    if (url === resolved.href) {
+      source = wrapExports(url, source, mocks)
+    }
     return _createModule(url, source, unknown, buffer)
   }
 
