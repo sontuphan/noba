@@ -23,9 +23,9 @@
         <div class='clearfix'>
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">32.63% </span>
+                <span class="strong">32.29% </span>
                 <span class="quiet">Statements</span>
-                <span class='fraction'>62/190</span>
+                <span class='fraction'>62/192</span>
             </div>
         
             
@@ -44,9 +44,9 @@
         
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">32.63% </span>
+                <span class="strong">32.29% </span>
                 <span class="quiet">Lines</span>
-                <span class='fraction'>62/190</span>
+                <span class='fraction'>62/192</span>
             </div>
         
             
@@ -253,7 +253,9 @@
 <a name='L188'></a><a href='#L188'>188</a>
 <a name='L189'></a><a href='#L189'>189</a>
 <a name='L190'></a><a href='#L190'>190</a>
-<a name='L191'></a><a href='#L191'>191</a></td><td class="line-coverage quiet"><span class="cline-any cline-yes">1x</span>
+<a name='L191'></a><a href='#L191'>191</a>
+<a name='L192'></a><a href='#L192'>192</a>
+<a name='L193'></a><a href='#L193'>193</a></td><td class="line-coverage quiet"><span class="cline-any cline-yes">1x</span>
 <span class="cline-any cline-yes">1x</span>
 <span class="cline-any cline-yes">1x</span>
 <span class="cline-any cline-yes">1x</span>
@@ -276,6 +278,8 @@
 <span class="cline-any cline-yes">2x</span>
 <span class="cline-any cline-yes">1x</span>
 <span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
@@ -477,13 +481,12 @@ const _bareMock = <span class="fstat-no" title="function not covered" >async &lt
 <span class="cstat-no" title="statement not covered" ></span>
 <span class="cstat-no" title="statement not covered" >  // @ts-ignore</span>
 <span class="cstat-no" title="statement not covered" >  const { Addon } = await import('bare')</span>
-<span class="cstat-no" title="statement not covered" >  const { exports } = Addon.load(</span>
-<span class="cstat-no" title="statement not covered" >    Addon.resolve(</span>
-<span class="cstat-no" title="statement not covered" >      Object.keys(Addon.cache).find((m) =&gt;</span>
-<span class="cstat-no" title="statement not covered" >        /^builtin:bare-module@[A-Za-z0-9._-]+$/.test(m),</span>
-<span class="cstat-no" title="statement not covered" >      ),</span>
-<span class="cstat-no" title="statement not covered" >      import.meta.url,</span>
-<span class="cstat-no" title="statement not covered" >    ),</span>
+<span class="cstat-no" title="statement not covered" >  const builtin = Object.keys(Addon.cache).find((m) =&gt;</span>
+<span class="cstat-no" title="statement not covered" >    /^builtin:bare-module@[A-Za-z0-9._-]+$/.test(m),</span>
+<span class="cstat-no" title="statement not covered" >  )</span>
+<span class="cstat-no" title="statement not covered" >  if (!builtin) throw new Error('Cannot find `builtin:bare-module`')</span>
+<span class="cstat-no" title="statement not covered" >  const { exports }: any = Addon.load(</span>
+<span class="cstat-no" title="statement not covered" >    Addon.resolve(builtin, new URL(import.meta.url)),</span>
 <span class="cstat-no" title="statement not covered" >  )</span>
 <span class="cstat-no" title="statement not covered" ></span>
 <span class="cstat-no" title="statement not covered" >  const resolved = Module.resolve(specifier, new URL(parent))</span>
@@ -506,6 +509,7 @@ const _bareMock = <span class="fstat-no" title="function not covered" >async &lt
 <span class="cstat-no" title="statement not covered" >  ) {</span>
 <span class="cstat-no" title="statement not covered" >    const namespace = _createSyntheticModule(url, ...args)</span>
 <span class="cstat-no" title="statement not covered" >    if (url === resolved.href) target = namespace</span>
+<span class="cstat-no" title="statement not covered" ></span>
 <span class="cstat-no" title="statement not covered" >    return namespace</span>
 <span class="cstat-no" title="statement not covered" >  }</span>
 <span class="cstat-no" title="statement not covered" ></span>
@@ -584,7 +588,9 @@ const _bareMock = <span class="fstat-no" title="function not covered" >async &lt
 <span class="cstat-no" title="statement not covered" >    unknown: any,</span>
 <span class="cstat-no" title="statement not covered" >    buffer: any,</span>
 <span class="cstat-no" title="statement not covered" >  ) {</span>
-<span class="cstat-no" title="statement not covered" >    if (url === resolved.href) source = wrapExports(url, source, mocks)</span>
+<span class="cstat-no" title="statement not covered" >    if (url === resolved.href) {</span>
+<span class="cstat-no" title="statement not covered" >      source = wrapExports(url, source, mocks)</span>
+<span class="cstat-no" title="statement not covered" >    }</span>
 <span class="cstat-no" title="statement not covered" >    return _createModule(url, source, unknown, buffer)</span>
 <span class="cstat-no" title="statement not covered" >  }</span>
 <span class="cstat-no" title="statement not covered" ></span>
@@ -640,7 +646,7 @@ export const deepMock = async &lt;T extends MockObject&gt;(
             <div class='footer quiet pad2 space-top1 center small'>
                 Code coverage generated by
                 <a href="https://istanbul.js.org/" target="_blank" rel="noopener noreferrer">istanbul</a>
-                at 2025-10-15T08:03:01.564Z
+                at 2025-10-17T13:29:28.583Z
             </div>
         <script src="../prettify.js"></script>
         <script>
