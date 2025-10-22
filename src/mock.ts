@@ -25,7 +25,6 @@ const _bareMock = async <T extends MockObject>(
   parent: string,
   mocks: Partial<T> = {},
 ) => {
-  const { default: Module } = await import('bare-module')
   const { URL } = await import('bare-url')
   const { parse } = await import('acorn')
   const { generate } = await import('escodegen')
@@ -36,16 +35,12 @@ const _bareMock = async <T extends MockObject>(
     /^builtin:bare-module@[A-Za-z0-9._-]+$/.test(m),
   )
   if (!builtin) throw new Error('Cannot find `builtin:bare-module`')
+
   const { exports }: any = Addon.load(
     Addon.resolve(builtin, new URL(import.meta.url)),
   )
 
-  const resolved = Module.resolve(specifier, new URL(parent))
-
-  if (resolved.href in Module.cache)
-    throw new Error(
-      `The ${specifier} is already loaded. It's too late to mock.`,
-    )
+  const resolved = import.meta.resolve(specifier, parent)
 
   /**
    * To CJS libs
@@ -59,7 +54,7 @@ const _bareMock = async <T extends MockObject>(
     ...args: any[]
   ) {
     const namespace = _createSyntheticModule(url, ...args)
-    if (url === resolved.href) target = namespace
+    if (url === resolved) target = namespace
 
     return namespace
   }
@@ -139,15 +134,15 @@ const _bareMock = async <T extends MockObject>(
     unknown: any,
     buffer: any,
   ) {
-    if (url === resolved.href) {
+    if (url === resolved) {
       source = wrapExports(url, source, mocks)
     }
     return _createModule(url, source, unknown, buffer)
   }
 
   return async <A>(url: string): Promise<A> => {
-    const { exports: mocked } = Module.load(new URL(url))
-    return mocked as A
+    const mocked: A = await import(url)
+    return mocked
   }
 }
 
