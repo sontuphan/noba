@@ -1,6 +1,6 @@
 {
   "name": "noba",
-  "version": "1.5.0",
+  "version": "1.6.0",
   "description": "The isometric test framework for javascript/typescript",
   "main": "dist/index.cjs",
   "type": "module",
@@ -80,10 +80,9 @@
   },
   "dependencies": {
     "acorn": "^8.15.0",
-    "bare": "^1.23.5",
+    "bare": "1.23.5",
     "bare-cov": "^1.2.0",
     "bare-fs": "^4.4.11",
-    "bare-module": "6.0.1",
     "bare-process": "^4.2.2",
     "bare-subprocess": "^5.1.4",
     "bare-url": "^2.3.0",
