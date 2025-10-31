@@ -16,11 +16,14 @@ export default class To<A> {
     return Be.new(this.actual, this.reporter, this.negated)
   }
 
-  private expect = <E>(expected: E) => {
-    this.reporter.green('- Expected:', expected)
+  private expect = <E>(verb: string, expected: E) => {
+    this.reporter.green(
+      !this.negated ? '- Expected:' : '- Unexpected',
+      expected,
+    )
     this.reporter.red('- Received:', this.actual)
 
-    return `Expect ${this.actual} ${this.infinitive} ${expected}.`
+    return `Expect ${this.actual} ${this.infinitive} ${verb} ${expected}.`
   }
 
   private xor = (value: boolean) => {
@@ -50,7 +53,7 @@ export default class To<A> {
 
   equal = <E extends A>(expected: E) => {
     if (this.xor(this._equal(this.actual, expected))) return true
-    throw new Error(this.expect(`equal to ${expected}`))
+    throw new Error(this.expect('equal to', expected))
   }
 
   private _contain = <T>(received: T) => {
@@ -62,7 +65,7 @@ export default class To<A> {
 
   contain = <T>(received: T) => {
     if (this.xor(this._contain(received))) return true
-    throw new Error(this.expect(`contain ${received}`))
+    throw new Error(this.expect('contain', received))
   }
 
   private _containEqual = <T>(actual: unknown, received: T) => {
@@ -74,7 +77,7 @@ export default class To<A> {
 
   containEqual = <T>(received: T) => {
     if (this.xor(this._containEqual(this.actual, received))) return true
-    throw new Error(this.expect(`contain an equal of ${received}`))
+    throw new Error(this.expect('contain an equal of', received))
   }
 
   private _haveLength = (received: number) => {
@@ -85,7 +88,7 @@ export default class To<A> {
 
   haveLength = (received: number) => {
     if (this.xor(this._haveLength(received))) return true
-    throw new Error(this.expect(`have the length of ${received}`))
+    throw new Error(this.expect('have the length of', received))
   }
 
   private _haveBeenCalled = () => {
@@ -99,7 +102,7 @@ export default class To<A> {
 
   haveBeenCalled = () => {
     if (this.xor(this._haveBeenCalled())) return true
-    throw new Error(this.expect(`have been called`))
+    throw new Error(this.expect('have been called', 'once'))
   }
 
   private _haveBeenCalledWith = (...args: any[]) => {
@@ -114,6 +117,6 @@ export default class To<A> {
 
   haveBeenCalledWith = (...args: any[]) => {
     if (this.xor(this._haveBeenCalledWith(...args))) return true
-    throw new Error(this.expect(`have been called with ${args}`))
+    throw new Error(this.expect('have been called with', args))
   }
 }
