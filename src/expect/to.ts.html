@@ -23,9 +23,9 @@
         <div class='clearfix'>
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">86.55% </span>
+                <span class="strong">84.42% </span>
                 <span class="quiet">Statements</span>
-                <span class='fraction'>103/119</span>
+                <span class='fraction'>103/122</span>
             </div>
         
             
@@ -44,9 +44,9 @@
         
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">86.55% </span>
+                <span class="strong">84.42% </span>
                 <span class="quiet">Lines</span>
-                <span class='fraction'>103/119</span>
+                <span class='fraction'>103/122</span>
             </div>
         
             
@@ -182,7 +182,10 @@
 <a name='L117'></a><a href='#L117'>117</a>
 <a name='L118'></a><a href='#L118'>118</a>
 <a name='L119'></a><a href='#L119'>119</a>
-<a name='L120'></a><a href='#L120'>120</a></td><td class="line-coverage quiet"><span class="cline-any cline-yes">1x</span>
+<a name='L120'></a><a href='#L120'>120</a>
+<a name='L121'></a><a href='#L121'>121</a>
+<a name='L122'></a><a href='#L122'>122</a>
+<a name='L123'></a><a href='#L123'>123</a></td><td class="line-coverage quiet"><span class="cline-any cline-yes">1x</span>
 <span class="cline-any cline-yes">1x</span>
 <span class="cline-any cline-yes">1x</span>
 <span class="cline-any cline-yes">1x</span>
@@ -201,6 +204,9 @@
 <span class="cline-any cline-yes">106x</span>
 <span class="cline-any cline-yes">135x</span>
 <span class="cline-any cline-yes">135x</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
@@ -319,11 +325,14 @@ export default class To&lt;A&gt; {
     return Be.new(this.actual, this.reporter, this.negated)
   }
 &nbsp;
-  private expect = <span class="fstat-no" title="function not covered" >&lt;E&gt;(expected: E) =&gt; {</span>
-<span class="cstat-no" title="statement not covered" >    this.reporter.green('- Expected:', expected)</span>
+  private expect = <span class="fstat-no" title="function not covered" >&lt;E&gt;(verb: string, expected: E) =&gt; {</span>
+<span class="cstat-no" title="statement not covered" >    this.reporter.green(</span>
+<span class="cstat-no" title="statement not covered" >      !this.negated ? '- Expected:' : '- Unexpected',</span>
+<span class="cstat-no" title="statement not covered" >      expected,</span>
+<span class="cstat-no" title="statement not covered" >    )</span>
 <span class="cstat-no" title="statement not covered" >    this.reporter.red('- Received:', this.actual)</span>
 <span class="cstat-no" title="statement not covered" ></span>
-<span class="cstat-no" title="statement not covered" >    return `Expect ${this.actual} ${this.infinitive} ${expected}.`</span>
+<span class="cstat-no" title="statement not covered" >    return `Expect ${this.actual} ${this.infinitive} ${verb} ${expected}.`</span>
 <span class="cstat-no" title="statement not covered" >  }</span>
 &nbsp;
   private xor = (value: boolean) =&gt; {
@@ -353,7 +362,7 @@ export default class To&lt;A&gt; {
 &nbsp;
   equal = &lt;E extends A&gt;(expected: E) =&gt; {
     if (this.xor(this._equal(this.actual, expected))) return <span class="branch-0 cbranch-no" title="branch not covered" >true</span>
-<span class="cstat-no" title="statement not covered" >    throw new Error(this.expect(`equal to ${expected}`))</span>
+<span class="cstat-no" title="statement not covered" >    throw new Error(this.expect('equal to', expected))</span>
   }
 &nbsp;
   private _contain = &lt;T&gt;(received: T) =&gt; {
@@ -365,7 +374,7 @@ export default class To&lt;A&gt; {
 &nbsp;
   contain = &lt;T&gt;(received: T) =&gt; {
     if (this.xor(this._contain(received))) return <span class="branch-0 cbranch-no" title="branch not covered" >true</span>
-<span class="cstat-no" title="statement not covered" >    throw new Error(this.expect(`contain ${received}`))</span>
+<span class="cstat-no" title="statement not covered" >    throw new Error(this.expect('contain', received))</span>
   }
 &nbsp;
   private _containEqual = &lt;T&gt;(actual: unknown, received: T) =&gt; {
@@ -377,7 +386,7 @@ export default class To&lt;A&gt; {
 &nbsp;
   containEqual = &lt;T&gt;(received: T) =&gt; {
     if (this.xor(this._containEqual(this.actual, received))) return <span class="branch-0 cbranch-no" title="branch not covered" >true</span>
-<span class="cstat-no" title="statement not covered" >    throw new Error(this.expect(`contain an equal of ${received}`))</span>
+<span class="cstat-no" title="statement not covered" >    throw new Error(this.expect('contain an equal of', received))</span>
   }
 &nbsp;
   private _haveLength = (received: number) =&gt; {
@@ -388,7 +397,7 @@ export default class To&lt;A&gt; {
 &nbsp;
   haveLength = (received: number) =&gt; {
     if (this.xor(this._haveLength(received))) return <span class="branch-0 cbranch-no" title="branch not covered" >true</span>
-<span class="cstat-no" title="statement not covered" >    throw new Error(this.expect(`have the length of ${received}`))</span>
+<span class="cstat-no" title="statement not covered" >    throw new Error(this.expect('have the length of', received))</span>
   }
 &nbsp;
   private _haveBeenCalled = () =&gt; {
@@ -402,7 +411,7 @@ export default class To&lt;A&gt; {
 &nbsp;
   haveBeenCalled = () =&gt; {
     if (this.xor(this._haveBeenCalled())) return <span class="branch-0 cbranch-no" title="branch not covered" >true</span>
-<span class="cstat-no" title="statement not covered" >    throw new Error(this.expect(`have been called`))</span>
+<span class="cstat-no" title="statement not covered" >    throw new Error(this.expect('have been called', 'once'))</span>
   }
 &nbsp;
   private _haveBeenCalledWith = (...args: any[]) =&gt; {
@@ -417,7 +426,7 @@ export default class To&lt;A&gt; {
 &nbsp;
   haveBeenCalledWith = (...args: any[]) =&gt; {
     if (this.xor(this._haveBeenCalledWith(...args))) return <span class="branch-0 cbranch-no" title="branch not covered" >true</span>
-<span class="cstat-no" title="statement not covered" >    throw new Error(this.expect(`have been called with ${args}`))</span>
+<span class="cstat-no" title="statement not covered" >    throw new Error(this.expect('have been called with', args))</span>
   }
 }
 &nbsp;</pre></td></tr></table></pre>
@@ -427,7 +436,7 @@ export default class To&lt;A&gt; {
             <div class='footer quiet pad2 space-top1 center small'>
                 Code coverage generated by
                 <a href="https://istanbul.js.org/" target="_blank" rel="noopener noreferrer">istanbul</a>
-                at 2025-10-22T15:29:24.189Z
+                at 2025-11-04T12:36:34.771Z
             </div>
         <script src="../../prettify.js"></script>
         <script>
