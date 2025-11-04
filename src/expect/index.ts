@@ -13,11 +13,11 @@ export default class Expect<A> {
     return new To(this.actual, this.reporter)
   }
 
-  private expect = <E>(verb: string, expect: E) => {
-    this.reporter.green(!this.not ? '- Expected:' : '- Unexpected', expect)
+  private expect = <E>(verb: string, expected: E) => {
+    this.reporter.green('- Expected:', expected)
     this.reporter.red('- Received:', this.actual)
 
-    return `Expect ${this.actual} ${verb} ${expect}.`
+    return `Expect ${this.actual} ${verb} ${expected}.`
   }
 
   private _throws = (message: string | RegExp) => {

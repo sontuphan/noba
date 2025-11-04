@@ -20,7 +20,10 @@ export default class Be<A> {
   }
 
   private expect = <E>(expected: E) => {
-    this.reporter.green('- Expected:', expected)
+    this.reporter.green(
+      !this.negated ? '- Expected:' : '- Unexpected',
+      expected,
+    )
     this.reporter.red('- Received:', this.actual)
 
     return `Expect ${this.actual} ${this.infinitive} ${expected}.`

@@ -87,7 +87,9 @@ const runtime = detectRuntime()
 if (!runtime || !cmd) process.exit(1)
 
 let NOBA_MAIN_ID = Math.round(Math.random() * 10 ** 12).toString()
-while (NOBA_MAIN_ID.length !== 12) {}
+while (NOBA_MAIN_ID.length !== 12) {
+  NOBA_MAIN_ID = Math.round(Math.random() * 10 ** 12).toString()
+}
 
 const {
   flags: {
