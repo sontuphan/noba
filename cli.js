@@ -3,6 +3,10 @@ import { spawn, spawnSync } from 'child_process'
 import { rmSync } from 'fs'
 import { command, flag, footer, description, rest } from 'paparam'
 
+const {
+  default: { version: nobaVersion },
+} = await import('./package.json', { with: { type: 'json' } })
+
 /**
  * Utils
  */
@@ -28,6 +32,16 @@ const green = (e) => `\x1b[32m${e}\x1b[0m`
 const yellow = (e) => `\x1b[33m${e}\x1b[0m`
 const blue = (e) => `\x1b[34m${e}\x1b[0m`
 const purple = (e) => `\x1b[35m${e}\x1b[0m`
+
+const uuid = (length = 12) => {
+  if (length <= 0) return ''
+  let uid = ''
+  while (uid.length < length) {
+    const num = Math.floor(Math.random() * 10)
+    if (uid || num) uid = uid + num.toString()
+  }
+  return uid
+}
 
 /**
  * CLI
@@ -86,10 +100,7 @@ const runtime = detectRuntime()
 
 if (!runtime || !cmd) process.exit(1)
 
-let NOBA_MAIN_ID = Math.round(Math.random() * 10 ** 12).toString()
-while (NOBA_MAIN_ID.length !== 12) {
-  NOBA_MAIN_ID = Math.round(Math.random() * 10 ** 12).toString()
-}
+const NOBA_MAIN_ID = uuid()
 
 const {
   flags: {
@@ -108,11 +119,6 @@ const coverageTmp = `${coverageDir}/tmp`
 const files = cmd.rest || []
 
 if (version) {
-  const {
-    default: { version: nobaVersion },
-  } = await import('./package.json', {
-    with: { type: 'json' },
-  })
   console.log(purple('noba'), nobaVersion)
   process.exit(0)
 }
@@ -259,7 +265,7 @@ const teardown = (file) => {
   }
 
   // Summary test result
-  console.log(yellow(`\nNoba ${version} [Env: ${runtime}]`))
+  console.log(yellow(`\nNoba ${nobaVersion} [Env: ${runtime}]`))
   console.log(
     `Run total`,
     blue(`${total} ${total > 1 ? 'tests' : 'test'}`),
