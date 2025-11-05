@@ -36,7 +36,8 @@ export default class Expect<A> {
   throws = (message: string | RegExp, msg?: string) => {
     if (this._throws(message)) return true
     throw new Error(
-      msg || this.expect('to throw', `an error with message sastifying ${msg}`),
+      msg ||
+        this.expect('to throw', `an error with message sastifying ${message}`),
     )
   }
 
@@ -57,7 +58,7 @@ export default class Expect<A> {
     if (await this._rejects(message)) return true
     throw new Error(
       msg ||
-        this.expect('to reject', `an error with message sastifying ${msg}`),
+        this.expect('to reject', `an error with message sastifying ${message}`),
     )
   }
 
