@@ -228,7 +228,7 @@ export default class Assert {
         this.expect(
           'the function',
           'not to throw',
-          `an error with message sastifying ${msg}`,
+          `an error with message sastifying ${error}`,
         ),
     )
   }
@@ -250,32 +250,32 @@ export default class Assert {
 
   rejects = async (
     fn: () => Promise<void>,
-    message: string | RegExp,
+    error: string | RegExp,
     msg?: string,
   ) => {
-    if (await this._rejects(fn, message)) return true
+    if (await this._rejects(fn, error)) return true
     throw new Error(
       msg ||
         this.expect(
           'the function',
           'to reject',
-          `an error with message sastifying ${msg}`,
+          `an error with message sastifying ${error}`,
         ),
     )
   }
 
   doesNotReject = async (
     fn: () => Promise<void>,
-    message: string | RegExp,
+    error: string | RegExp,
     msg?: string,
   ) => {
-    if (!(await this._rejects(fn, message))) return true
+    if (!(await this._rejects(fn, error))) return true
     throw new Error(
       msg ||
         this.expect(
           'the function',
           'not to reject',
-          `an error with message sastifying ${msg}`,
+          `an error with message sastifying ${error}`,
         ),
     )
   }
