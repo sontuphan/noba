@@ -2,13 +2,20 @@ A mock is a fake version of a module, function, or object that you use instead o
 
 By mixing mock and [spy](/sontuphan/noba/wiki/spy), you can verify not only that certain functions were called, but also how they were called and with what arguments. This helps ensure your code interacts with dependencies as expected during testing.
 
-> 💡 Currently mock supports ES modules only.
+> 💡 Mocks work on ES module imports. `deepMock` is available on Node and Bare only.
 
-# Basic Use
+| Function      | What it replaces                         | Who sees the mock                                   |
+| ------------- | ---------------------------------------- | --------------------------------------------------- |
+| `shallowMock` | Exports of one module                    | Only the proxy it returns                           |
+| `deepMock`    | Exports of a dependency, however deep    | Every module loaded through the returned `deepImport` |
 
-## Shallow Mock
+Both are async, so `await` them, typically inside an `async` `describe` callback before registering tests.
 
-A shallow mock replaces the directly exported functions or values from a module. When using `shallowMock`, it returns a mocked version of the module, which you should use in your tests to ensure the mock is active.
+# Shallow Mock
+
+`shallowMock(url, mocks, attributes?)` imports the module at `url` and returns a proxy of it where the keys in `mocks` are replaced. Other exports pass through unchanged.
+
+The real module is not modified: code that imports it directly still gets the original. Use the returned object in your tests.
 
 ```ts
 import { describe } from 'noba'
@@ -30,11 +37,17 @@ describe('shallowMock', async ({ test }) => {
 })
 ```
 
-## Deep Mock
+`url` must be resolved (for example with `import.meta.resolve`). The optional `attributes` are passed to `import()`, for example `{ with: { type: 'json' } }`.
 
-A deep mock replaces not only the directly exported functions or values, but also any nested properties or methods within the module. This is useful when you need to mock complex modules with multiple layers of objects or functions.
+# Deep Mock
 
-Note that unlike `shallowMock`, `deepMock` does not return a mocked module directly. Instead, it provides a custom `deepImport` function, which you use to import any module that depends on the mocked module. This ensures the mock is applied throughout the entire dependency tree.
+`deepMock(specifier, parent, mocks)` replaces the exports of `specifier` for every module that depends on it, however deep in the dependency tree. This is what you need when the code under test imports the dependency itself.
+
+Unlike `shallowMock`, `deepMock` does not return a mocked module. It returns a `deepImport` function: import the module under test with `deepImport` instead of `import`, and the mock is applied throughout its dependency tree.
+
+- `specifier`: the dependency to replace, as it is written in the `import` statements (e.g. `'asciichart'`).
+- `parent`: the URL to resolve `specifier` from, usually `import.meta.url`.
+- `mocks`: the exports to replace.
 
 ```ts
 // ./chart.util.ts
@@ -46,7 +59,9 @@ export const getChart = () => {
     .map((_, i, a) => 4 * Math.sin(i * ((Math.PI * 4) / a.length)))
   return plot(s)
 }
+```
 
+```ts
 // ./deepMock.test.ts
 import { describe } from 'noba'
 import { deepMock } from 'noba/mock'
@@ -63,11 +78,15 @@ describe('deeply mock', async ({ test }) => {
   )
 
   test('should deep mock a file', async ({ expect }) => {
-    const { readChart } = await deepImport<typeof import('./chart.util')>(
+    const { getChart } = await deepImport<typeof import('./chart.util')>(
       import.meta.resolve('./chart.util.ts'),
     )
-    const data = readChart()
+    const data = getChart()
     expect(data).to.be(mockedData)
   })
 })
 ```
+
+On Node, `deepMock` uses [esmock](https://github.com/iambumblehead/esmock). On Bare, it hooks the module loader, so the mock applies to modules loaded after the `deepMock` call.
+
+See [the tests](/sontuphan/noba/tree/master/tests/mock) for working examples.

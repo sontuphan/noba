@@ -1,13 +1,36 @@
+`expect` is passed to every `test` callback. Each matcher has two spellings that behave the same: a Jest-style one (`expect(a).toBe(b)`) and a chained one (`expect(a).to.be(b)`). Negation uses the chained form: `expect(a).not.to.be(b)`.
+
+| Jest-style             | Chained                   |
+| ---------------------- | ------------------------- |
+| `toBe`                 | `to.be`                   |
+| `toEqual`              | `to.equal`                |
+| `toBeTruthy`           | `to.be.truthy`            |
+| `toBeFalsy`            | `to.be.falsy`             |
+| `toBeNull`             | `to.be.null`              |
+| `toBeNaN`              | `to.be.nan`               |
+| `toBeUndefined`        | `to.be.undefined`         |
+| `toBeDefined`          | `to.be.defined`           |
+| `toContain`            | `to.contain`              |
+| `toContainEqual`       | `to.containEqual`         |
+| `toBeOneOf`            | `to.be.oneOf`             |
+| `toBeTypeOf`           | `to.be.typeOf`            |
+| `toBeInstanceOf`       | `to.be.instanceOf`        |
+| `toHaveLength`         | `to.haveLength`           |
+| `toHaveBeenCalled`     | `to.haveBeenCalled`       |
+| `toHaveBeenCalledWith` | `to.haveBeenCalledWith`   |
+| `throws`               | n/a, cannot be negated   |
+| `rejects`              | n/a, cannot be negated   |
+
 # toBe
 
-To strictly compare values. In the case of objects, it actually compares their references (pointers). If you wish to deep compare objects, let's use [toEqual](#toEqual).
+To strictly compare values. In the case of objects, it actually compares their references (pointers). If you wish to deep compare objects, let's use [toEqual](#toequal).
 
 ```ts
 describe('toBe', ({ test }) => {
   test('should be same values', ({ expect }) => {
     expect(1).toBe(1) // Ok
     expect(1n).toBe(1n) // Ok
-    expect('string').to.be('string') //
+    expect('string').to.be('string') // Ok
   })
 
   test('should be same objects', ({ expect }) => {
@@ -36,7 +59,7 @@ describe('not.to.be', ({ test }) => {
 
 # toEqual
 
-Checks if two values are deeply equal. For objects and arrays, this means their properties and contents are recursively compared.
+Checks if two values are deeply equal. For objects and arrays, this means their own enumerable keys are recursively compared with `===` at the leaves. Prototypes are not compared, so `[]` and `{}` are equal.
 
 ```ts
 describe('toEqual', ({ test }) => {
@@ -210,7 +233,7 @@ describe('not.to.be.defined', ({ test }) => {
 
 # toContain
 
-Checks if an array or string contains a value.
+Checks if an array contains a value (compared with `===`) or a string contains a substring. Any other type fails.
 
 ```ts
 describe('toContain', ({ test }) => {
@@ -243,7 +266,7 @@ describe('not.to.contain', ({ test }) => {
 
 # toContainEqual
 
-Checks if an array or string contains a value.
+Like [toContain](#tocontain), but array items are compared with deep equality ([toEqual](#toequal)) instead of `===`. On strings it behaves like `toContain`.
 
 ```ts
 describe('toContainEqual', ({ test }) => {
@@ -271,7 +294,7 @@ describe('not.to.contain.equal', ({ test }) => {
 
 # toBeOneOf
 
-Checks if a value is strictly equal to one of the provided values.
+Checks if a value is strictly equal (`===`) to one of the provided values, so objects match only by reference.
 
 ```ts
 describe('toBeOneOf', ({ test }) => {
@@ -299,7 +322,7 @@ describe('not.to.be.oneOf', ({ test }) => {
 
 # toBeTypeOf
 
-Checks if a value is of a specific type.
+Checks the result of `typeof value`.
 
 ```ts
 describe('toBeTypeOf', ({ test }) => {
@@ -395,7 +418,7 @@ describe('not.to.be.instanceOf', ({ test }) => {
 
 # throws
 
-Checks if a function throws an error.
+Checks if a function throws an error whose `message` matches. A string matches if the message contains it; a regular expression matches if it tests true. There is no `not.throws`; use [assert.doesNotThrow](/sontuphan/noba/wiki/assert#throws-doesnotthrow).
 
 ```ts
 describe('throws', ({ test }) => {
@@ -417,7 +440,7 @@ describe('throws', ({ test }) => {
 
 # rejects
 
-Checks if an asynchronous function returns a rejected promise.
+Checks if an asynchronous function returns a rejected promise whose error `message` matches, the same way as [throws](#throws). Remember to `await` it. There is no `not.rejects`; use [assert.doesNotReject](/sontuphan/noba/wiki/assert#rejects-doesnotreject).
 
 ```ts
 describe('rejects', ({ test }) => {
@@ -425,13 +448,17 @@ describe('rejects', ({ test }) => {
     await expect(async () => {
       throw new Error('failed function')
     }).rejects('failed') // Ok
+
+    await expect(async () => {
+      throw new Error('failed function')
+    }).rejects(/function$/) // Ok
   })
 })
 ```
 
 # toHaveLength
 
-Checks if an object, array, or string has the expected length.
+Checks if an array or string has the expected length. Other values, including objects with a `length` property, fail.
 
 ```ts
 describe('toHaveLength', ({ test }) => {
@@ -442,20 +469,25 @@ describe('toHaveLength', ({ test }) => {
   test('should check length of string', ({ expect }) => {
     expect('hello').toHaveLength(5)
   })
+})
+```
 
-  test('should check length of object with length property', ({ expect }) => {
-    expect({ length: 2 }).toHaveLength(2)
+```ts
+describe('not.to.haveLength', ({ test }) => {
+  test('should not have the length', ({ expect }) => {
+    expect('hello').not.to.haveLength(4)
   })
 })
 ```
 
 # toHaveBeenCalled
 
-Checks if a spied function whether being called or not.
-
-[Learn more about Spy.](/sontuphan/noba/wiki/spy)
+Checks if a [spied](/sontuphan/noba/wiki/spy) function has been called at least once.
 
 ```ts
+import { describe } from 'noba'
+import { spy } from 'noba/spy'
+
 describe('toHaveBeenCalled', ({ test }) => {
   test('should be called on a spied function', ({ expect }) => {
     const fn = spy(() => {})
@@ -464,16 +496,23 @@ describe('toHaveBeenCalled', ({ test }) => {
 
     expect(fn).toHaveBeenCalled()
   })
+
+  test('should not be called', ({ expect }) => {
+    const fn = spy(() => {})
+
+    expect(fn).not.to.haveBeenCalled()
+  })
 })
 ```
 
 # toHaveBeenCalledWith
 
-Checks if a spied function being called with specific inputs.
-
-[Learn more about Spy.](/sontuphan/noba/wiki/spy)
+Checks if any call to a [spied](/sontuphan/noba/wiki/spy) function received exactly these arguments, compared with deep equality.
 
 ```ts
+import { describe } from 'noba'
+import { spy } from 'noba/spy'
+
 describe('toHaveBeenCalledWith', ({ test }) => {
   test('should be called with a predefined params on a spied sync function', ({
     expect,

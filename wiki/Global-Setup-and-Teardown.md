@@ -1,69 +1,64 @@
+Global setup and teardown run a script once around the whole test run: setup before the first test file, teardown after the last one.
+
+Each script runs in its own process with the same runtime as the tests (including `--register`), so it cannot share in-memory state with test files. Use files, a database, or a server that outlives the process to pass state along. If the script exits with code `1`, Noba stops immediately.
+
 # Global Setup
 
-This option allows the use of a custom global setup module. The setup will be triggered once before all test suites. The setup runner will share the same runner as tests
-
 ```js
-// ./test/globals/setup.js
+// ./tests/globals/setup.js
 
-const setup = () => {
+const setup = async () => {
   console.log('Global Setup')
 }
 
-setup()
+await setup()
 ```
 
 ```bash
-noba --globalSetup ./test/globals/setup.js
-```
-
-```bash
-npm i -g tsx
-noba --register tsx --globalSetup ./test/globals/setup.ts
+noba --globalSetup ./tests/globals/setup.js ./tests/*.test.js
 ```
 
 # Global Teardown
 
-This option allows the use of a custom global teardown module. The teardown will be triggered once after all test suites. The teardown runner will share the same runner as tests
-
 ```js
-// ./test/globals/teardown.js
+// ./tests/globals/teardown.js
 
-const teardown = () => {
+const teardown = async () => {
   console.log('Global Teardown')
 }
 
-teardown()
+await teardown()
 ```
 
 ```bash
-noba --globalTeardown ./test/globals/teardown.js
+noba --globalTeardown ./tests/globals/teardown.js ./tests/*.test.js
 ```
 
 # With custom runner
 
-For example, a typescript setup & teardown.
+For example, a TypeScript setup and teardown. The runner must be installed locally, since `--register` looks it up in `./node_modules/.bin/`.
 
 ```ts
-// ./test/globals/setup.ts
+// ./tests/globals/setup.ts
 
-const setup = () => {
+const setup = async (): Promise<void> => {
   console.log('Typescript Global Setup')
 }
 
-setup()
+await setup()
 ```
 
 ```ts
-// ./test/globals/teardown.ts
+// ./tests/globals/teardown.ts
 
-const teardown = async () => {
+const teardown = async (): Promise<void> => {
   console.log('Typescript Global Teardown')
 }
 
-teardown()
+await teardown()
 ```
 
 ```bash
-npm i -g tsx
-noba --register tsx --globalSetup ./test/globals/setup.ts --globalTeardown ./test/globals/teardown.ts
+npm i -D tsx
+noba --register tsx --globalSetup ./tests/globals/setup.ts --globalTeardown ./tests/globals/teardown.ts ./tests/*.test.ts
 ```
