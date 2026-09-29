@@ -27,7 +27,7 @@ noba-bare ./tests/*.test.js  # Bare
 
 # Introduction
 
-To enhance the developer experience (DX) for `wdk-wallet-*` and `wdk-protocol-*`, and to foster seamless team collaboration, our current testing approach needs improvement. We face several challenges with both manual and automated testing:
+To enhance the developer experience (DX) for projects targeting Node.js and Bare, and to foster seamless team collaboration, our current testing approach needs improvement. We face several challenges with both manual and automated testing:
 
 - **Dual Test Runners.** Maintaining both Jest and Brittle for NodeJS and Bare targets leads to duplicated tests. This results in:
 
@@ -36,7 +36,7 @@ To enhance the developer experience (DX) for `wdk-wallet-*` and `wdk-protocol-*`
 
 - **Brittle Limitations.** Brittle lacks essential features for comprehensive testing, such as mocking, spying, advanced matchers, type safety, and robust reporting.
 
-- **Integration Repo Constraints.** The [wdk-experiments](https://github.com/claudiovb/wdk-experiments) repo was created to integrate tests for `wdk-wallet-*` and `wdk-protocol-*` across environments. However, it is not a true test runner and presents several issues:
+- **Integration Repo Constraints.** Separate integration repositories can combine tests for related packages across environments. However, without a dedicated test runner, this approach presents several issues:
   - High maintenance overhead
   - Incompatibility with CI/CD pipelines
   - Reliance on side channels for environment variables

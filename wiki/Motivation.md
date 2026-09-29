@@ -18,7 +18,7 @@ A **runtime abstraction layer** is the missing piece that Noba introduces. With 
 
 ## DX Enhancement
 
-Today, maintaining compatibility of a project like WDK across different runtimes (for example, Node.js and Bare) comes with a heavy cost to developer experience (DX). Teams often have to duplicate the entire test suite into two separate frameworks:
+Today, maintaining compatibility of a JavaScript project across different runtimes (for example, Node.js and Bare) comes with a heavy cost to developer experience (DX). Teams often have to duplicate the entire test suite into two separate frameworks:
 
 - Jest for Node.js
 - Brittle for Bare
@@ -65,8 +65,8 @@ describe('WalletManagerEvm', () => {
 
 import test from 'brittle'
 
-import WalletManagerEvm, { WalletAccountEvm } from '@wdk/wallet-evm'
-import { JsonRpcProvider } from "ethers" with { imports: "bare-wdk-runtime/package" }
+import WalletManagerEvm, { WalletAccountEvm } from '../index.js'
+import { JsonRpcProvider } from 'ethers'
 
 const PROVIDER = 'http://127.0.0.1:8545'
 const SEED_PHRASE = ''
@@ -112,14 +112,8 @@ Noba solves this by unifying the testing workflow.
 
 import { describe } from 'noba'
 
-import WalletManagerEvm, { WalletAccountEvm } from '@wdk/wallet-evm'
-
-const isBare = 'Bare' in global
-const shims = isBare ? { imports: 'bare-wdk-runtime/package' } : {}
-
-const { JsonRpcProvider } = await import('ethers', {
-  with: shims,
-})
+import WalletManagerEvm, { WalletAccountEvm } from '../index.js'
+import { JsonRpcProvider } from 'ethers'
 
 const PROVIDER = 'http://127.0.0.1:8545'
 
@@ -164,13 +158,13 @@ noba-bare ./test/*.test.js  # Run the same tests in Bare
 By adopting Noba, teams gain several key benefits:
 
 - No more duplicated tests.
-- Improved tooling compatibility: dynamic import attributes are now recognized by tools like StandardJS and Prettier, reducing linting friction.
+- Consistent assertions and lifecycle hooks across runtimes.
 
 ## Feature Enhancement
 
 Some test scripts written in Jest cannot be migrated to Brittle because of Brittle's limited feature set. This restriction prevents teams from running comprehensive tests in Bare, forcing them to either rewrite tests with reduced coverage or skip certain scenarios altogether.
 
-For example, mocking is an essential feature in Jest, heavily used in projects like wdk-wallet-spark and for hardware interaction testing. Mocking allows developers to isolate components, simulate dependencies, and verify behavior without relying on real implementations. However, this feature is not supported in Brittle, which means the team cannot execute the same test cases in Bare, leaving critical parts of the testing pipeline unverified.
+For example, mocking is an essential feature in Jest, heavily used for SDK integration and hardware interaction testing. Mocking allows developers to isolate components, simulate dependencies, and verify behavior without relying on real implementations. However, this feature is not supported in Brittle, which means the team cannot execute the same test cases in Bare, leaving critical parts of the testing pipeline unverified.
 
 ```js
 // ./tests/wallet-account-read-only-spark.test.js
