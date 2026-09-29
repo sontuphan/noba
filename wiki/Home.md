@@ -1,14 +1,29 @@
 # Welcome to Noba - The isometric testing framework.
 
+Let's build your runtime-neutral tests. Write once, test everywhere.
+
 🚀 [Getting Started](/sontuphan/noba/wiki/getting-started)
 
-🤖 [CLI](/sontuphan/noba/wiki/cli)
+🤖 [CLI](/sontuphan/noba/wiki/cli) · [Global Setup and Teardown](/sontuphan/noba/wiki/global-setup-and-teardown)
 
-📖 [References](/sontuphan/noba/wiki/references)
+📖 [References](/sontuphan/noba/wiki/references) · [Expect](/sontuphan/noba/wiki/expect) · [Assert](/sontuphan/noba/wiki/assert) · [Spy](/sontuphan/noba/wiki/spy) · [Mock](/sontuphan/noba/wiki/mock)
 
 ✅ [Examples](/sontuphan/noba/tree/master/tests)
 
-Let's build your runtime-neutral tests. Write once, test everywhere.
+```js
+import { describe } from 'noba'
+
+describe('sum', ({ test }) => {
+  test('should add 1 and 1', ({ expect }) => {
+    expect(1 + 1).toBe(2)
+  })
+})
+```
+
+```bash
+noba ./tests/*.test.js       # Node.js
+noba-bare ./tests/*.test.js  # Bare
+```
 
 # Introduction
 
@@ -21,7 +36,7 @@ To enhance the developer experience (DX) for `wdk-wallet-*` and `wdk-protocol-*`
 
 - **Brittle Limitations.** Brittle lacks essential features for comprehensive testing, such as mocking, spying, advanced matchers, type safety, and robust reporting.
 
-- **Integration Repo Constraints.** The [wdk-experiment](https://github.com/claudiovb/wdk-experiments) repo was created to integrate tests for `wdk-wallet-*` and `wdk-protocol-*` across environments. However, it is not a true test runner and presents several issues:
+- **Integration Repo Constraints.** The [wdk-experiments](https://github.com/claudiovb/wdk-experiments) repo was created to integrate tests for `wdk-wallet-*` and `wdk-protocol-*` across environments. However, it is not a true test runner and presents several issues:
   - High maintenance overhead
   - Incompatibility with CI/CD pipelines
   - Reliance on side channels for environment variables
@@ -31,7 +46,7 @@ To address these issues, we introduced [Noba](https://github.com/sontuphan/noba)
 
 1. **Runtime-Agnostic.** Noba abstracts away runtime-specific APIs, relying on minimal JavaScript primitives (e.g., class-based shared state, `queueMicrotask`). This allows tests to be portable across environments.
 2. **TypeScript-First.** With TypeScript at its core, Noba ensures type safety, robust autocompletion, static analysis, and early error detection throughout all APIs and utilities.
-3. **Jest-Like API.** Noba’s API is intentionally familiar to Jest users, featuring similar function names (`describe`, `test`, `it`), matcher syntax (`expect`, `assert`), and lifecycle hooks (`beforeAll`, `afterAll`, `beforeEach`, `afterEach`). This eases migration and reduces the learning curve.
+3. **Jest-Like API.** Noba's API is intentionally familiar to Jest users, featuring similar function names (`describe`, `test`, `it`), matcher syntax (`expect`, `assert`), and lifecycle hooks (`beforeAll`, `afterAll`, `beforeEach`, `afterEach`). This eases migration and reduces the learning curve. The main difference: `test`, hooks and nested `describe` come from the callback arguments instead of globals, and so do `expect` and `assert` inside a test.
 
 **Adopting Noba will:**
 

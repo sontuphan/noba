@@ -2,18 +2,23 @@
 
 `describe` lets you organize hooks (i.e. `beforeAll`, `afterAll`, `beforeEach`, `afterEach`), test cases (i.e. `it`, `test`), and even sub-`describe` into logical sections.
 
+Always use the `describe`, `test`, hooks and `each` passed to the callback, not the top-level imports. The callback arguments are bound to the current section; the imported ones register at the top level of the file.
+
+The callback may be `async`, for example to `await` a mock before registering tests. Tests are registered while the callback runs and executed after it returns, in the order they were declared.
+
 ## API
 
 ```ts
 describe('describe a logical section', ({
+  describe,
   beforeAll,
   afterAll,
   beforeEach,
   afterEach,
   test,
   it,
-  log,
   each,
+  log,
 }) => {
   // a logical section
 })
@@ -41,18 +46,21 @@ describe('parent', ({ describe, test }) => {
 
 Run only this `describe` block (and its children), skipping all sibling `describe` and `test` blocks. If multiple `.only` are present, only the last sibling's `.only` takes effect.
 
+`.only` is scoped to its siblings: a `.only` inside a nested `describe` does not skip tests in other sections, and a `.only` in one file does not affect other files.
+
 ### API
 
 ```ts
 describe.only('describe only this section', ({
+  describe,
   beforeAll,
   afterAll,
   beforeEach,
   afterEach,
   test,
   it,
-  log,
   each,
+  log,
 }) => {
   // only this describe block (and its children) will run
 })
@@ -88,14 +96,15 @@ Skip this `describe`.
 
 ```ts
 describe.skip('skip this section', ({
+  describe,
   beforeAll,
   afterAll,
   beforeEach,
   afterEach,
   test,
   it,
-  log,
   each,
+  log,
 }) => {
   // this describe block (and its children) will be skipped
 })
@@ -124,6 +133,8 @@ describe('parent', ({ describe, test }) => {
 > alias `it`
 
 `test` specifies what behavior you `expect` (or `assert`) and verifies it.
+
+The callback may be `async`. A test fails if it throws, rejects, or runs longer than the timeout set by `--timeout` (default: 10000ms). See [Expect](/sontuphan/noba/wiki/expect) and [Assert](/sontuphan/noba/wiki/assert) for the matchers.
 
 ## API
 
@@ -161,7 +172,7 @@ Run only this `test` block, skipping all sibling `describe` and `test` blocks. I
 
 ```ts
 test.only('should test this only', ({ expect, assert, log }) => {
-  // only this describe block (and its children) will run
+  // only this test will run
 })
 ```
 
@@ -215,12 +226,12 @@ describe('suite', ({ test }) => {
 
 # each
 
-`each` allows a test to iterate over a list of arguments and run the test multiple times.
+`each` allows a test to iterate over a list of arguments and run the test multiple times. The current item is passed as `arg`.
 
 ## API
 
 ```ts
-each(args, ({ describe, test, it, log }) => {
+each(args, ({ arg, describe, test, it, log }) => {
   // define the test
 })
 ```
@@ -249,6 +260,16 @@ describe('main', ({ each }) => {
     })
   })
 })
+```
+
+# Hooks
+
+All four hooks take an optional timeout in milliseconds as the second argument. Without it, a hook has no time limit. A hook that throws is reported as an exception, and the run continues.
+
+```ts
+beforeAll(async () => {
+  // setup code
+}, 3000)
 ```
 
 # beforeAll
@@ -298,22 +319,26 @@ afterAll(({ log }) => {
 ```ts
 import { describe } from 'noba'
 
-describe('suite', ({ afterAll, test }) => {
+describe('suite', ({ beforeAll, afterAll, test }) => {
   let db
 
-  afterAll(() => {
-    if (db) db.disconnect()
+  beforeAll(async () => {
+    db = await connectToDatabase()
   })
 
-  test('dummy test', ({ expect }) => {
-    expect(db.connection).to.be.undefined()
+  afterAll(async () => {
+    await db.disconnect()
+  })
+
+  test('db is connected', ({ expect }) => {
+    expect(db.connection).to.be.defined()
   })
 })
 ```
 
 # beforeEach
 
-`beforeEach` runs a setup function before each `test` in the current `describe` block.
+`beforeEach` runs a setup function before each `test` in the current `describe` block, including tests in nested `describe` blocks. Parent `beforeEach` hooks run before child ones.
 
 ## API
 
@@ -343,7 +368,7 @@ describe('suite', ({ beforeEach, test }) => {
 
 # afterEach
 
-`afterEach` runs a teardown function after each `test` in the current `describe` block.
+`afterEach` runs a teardown function after each `test` in the current `describe` block, including tests in nested `describe` blocks. Parent `afterEach` hooks run before child ones.
 
 ## API
 
@@ -375,10 +400,12 @@ describe('suite', ({ afterEach, test }) => {
 
 The `log` utility provides a way to output messages during test execution, which can help with debugging or providing additional context.
 
+`log` takes the same arguments as `console.log`. Use it instead of `console.log` so the output stays inside the test's group in the report.
+
 ## API
 
 ```ts
-log('message')
+log('message', ...args)
 ```
 
 ## Example
@@ -389,6 +416,27 @@ import { describe } from 'noba'
 describe('logging example', ({ test, log }) => {
   test('should log a message', () => {
     log('This is a log message inside the test')
+  })
+})
+```
+
+# Utilities
+
+`noba` also exports a few runtime-neutral helpers.
+
+| Export            | Description                                                         |
+| ----------------- | ------------------------------------------------------------------- |
+| `delay(ms)`       | Returns a promise that resolves after `ms` milliseconds.            |
+| `uuid(length?)`   | Returns a pseudo-random numeric id (default length: 12). Not secure. |
+| `detectRuntime()` | Returns `'node'`, `'bare'`, `'bun'`, `'deno'`, or `''`.             |
+
+```ts
+import { delay, describe, detectRuntime } from 'noba'
+
+describe('utils', ({ test }) => {
+  test('should wait', async ({ expect }) => {
+    await delay(100)
+    expect(detectRuntime()).to.be.oneOf(['node', 'bare'])
   })
 })
 ```

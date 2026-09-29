@@ -1,6 +1,14 @@
+`assert` is passed to every `test` callback. Each assertion returns `true` when it passes and throws when it fails.
+
+Every assertion takes an optional last argument to replace the default failure message:
+
+```ts
+assert.equal(1 + 1, 2, 'math is broken')
+```
+
 # equal, notEqual
 
-To loosely compare values (i.e. `==`). In the case of objects, it actually compares their references (pointers). If you wish to deep compare objects, let's use [deepEqual](#deepEqual).
+To loosely compare values (i.e. `==`). In the case of objects, it actually compares their references (pointers). If you wish to deep compare objects, let's use [deepEqual](#deepequal-notdeepequal).
 
 ```ts
 describe('equal', ({ test }) => {
@@ -31,24 +39,24 @@ describe('notEqual', ({ test }) => {
 
 # strictEqual
 
-To strictly compare values (i.e. `===`)
+To strictly compare values (i.e. `===`). There is no `notStrictEqual`; use `assert.isNotOk(a === b)` or `expect(a).not.to.be(b)`.
 
 ```ts
 describe('strictEqual', ({ test }) => {
-  test('should stricly compare 2 equal values', ({ assert }) => {
-    assert.equal('abc', 'abc') // Ok
-    assert.equal(0, false) // Failed
+  test('should strictly compare 2 equal values', ({ assert }) => {
+    assert.strictEqual('abc', 'abc') // Ok
+    assert.strictEqual(0, false) // Failed
 
     const a = { x: 1 }
     const b = { x: 1 }
-    assert.equal(a, b) // Failed
+    assert.strictEqual(a, b) // Failed
   })
 })
 ```
 
-# deepEqual
+# deepEqual, notDeepEqual
 
-Checks if two values are deeply equal. For objects and arrays, this means their properties and contents are recursively compared.
+Checks if two values are deeply equal. For objects and arrays, this means their own enumerable keys are recursively compared with `===` at the leaves. Prototypes are not compared, so `[]` and `{}` are deeply equal.
 
 ```ts
 describe('deepEqual', ({ test }) => {
@@ -60,14 +68,23 @@ describe('deepEqual', ({ test }) => {
 })
 ```
 
+```ts
+describe('notDeepEqual', ({ test }) => {
+  test('should differ 2 inequal objects', ({ assert }) => {
+    assert.notDeepEqual({ a: 1 }, { a: 2 })
+  })
+})
+```
+
 # isUndefined, isNotUndefined
 
 Checks if a value is `undefined`.
 
 ```ts
 describe('isUndefined', ({ test }) => {
-  test('should not be undefined', ({ assert }) => {
-    assert.isNotUndefined(null)
+  test('should be undefined', ({ assert }) => {
+    assert.isUndefined(undefined) // Ok
+    assert.isUndefined(null) // Failed
   })
 })
 ```
@@ -97,6 +114,28 @@ describe('isNull', ({ test }) => {
 describe('isNotNull', ({ test }) => {
   test('should not be null', ({ assert }) => {
     assert.isNotNull(undefined)
+  })
+})
+```
+
+# isNaN, isNotNaN
+
+Checks if a value is `NaN` (using `Number.isNaN`, so `'abc'` is not `NaN`).
+
+```ts
+describe('isNaN', ({ test }) => {
+  test('should be NaN', ({ assert }) => {
+    assert.isNaN(NaN) // Ok
+    assert.isNaN('abc') // Failed
+  })
+})
+```
+
+```ts
+describe('isNotNaN', ({ test }) => {
+  test('should not be NaN', ({ assert }) => {
+    assert.isNotNaN(1)
+    assert.isNotNaN(undefined)
   })
 })
 ```
@@ -173,11 +212,11 @@ describe('isNotFalse', ({ test }) => {
 
 # isExist, isNotExist
 
-Checks if a value is not null and undefined.
+Checks if a value is neither `null` nor `undefined`.
 
 ```ts
 describe('isExist', ({ test }) => {
-  test('should be exist', ({ assert }) => {
+  test('should exist', ({ assert }) => {
     assert.isExist(true)
     assert.isExist(false)
     assert.isExist(0)
@@ -188,7 +227,7 @@ describe('isExist', ({ test }) => {
 
 ```ts
 describe('isNotExist', ({ test }) => {
-  test('should not be true', ({ assert }) => {
+  test('should not exist', ({ assert }) => {
     assert.isNotExist(null)
     assert.isNotExist(undefined)
   })
@@ -227,9 +266,9 @@ describe('notInstanceOf', ({ test }) => {
 })
 ```
 
-# throws
+# throws, doesNotThrow
 
-Checks whether a function throws an error. You can match the thrown error by its message (exact string), a substring, or a regular expression.
+Checks whether a function throws an error whose `message` matches. A string matches if the message contains it; a regular expression matches if it tests true. The matcher is required.
 
 ```ts
 describe('throws', ({ test }) => {
@@ -253,9 +292,19 @@ describe('throws', ({ test }) => {
 })
 ```
 
-# rejects
+`doesNotThrow` passes when the function does not throw, and also when it throws an error that does not match.
 
-Checks whether an asynchronous function returns a rejected promise.
+```ts
+describe('doesNotThrow', ({ test }) => {
+  test('should not throw', ({ assert }) => {
+    assert.doesNotThrow(() => {}, 'abc')
+  })
+})
+```
+
+# rejects, doesNotReject
+
+Checks whether an asynchronous function returns a rejected promise whose error `message` matches. Matching works the same as [throws](#throws-doesnotthrow). Remember to `await` it, otherwise a failure is not reported against the test.
 
 ```ts
 describe('rejects', ({ test }) => {
@@ -275,6 +324,28 @@ describe('rejects', ({ test }) => {
     await assert.rejects(async () => {
       throw new Error('abc')
     }, /ab/)
+  })
+})
+```
+
+`doesNotReject` passes when the promise resolves, and also when it rejects with an error that does not match.
+
+```ts
+describe('doesNotReject', ({ test }) => {
+  test('should not reject', async ({ assert }) => {
+    await assert.doesNotReject(async () => {}, 'abc')
+  })
+})
+```
+
+# fail
+
+Fails the test unconditionally, with an optional message (default: `assertion failed`).
+
+```ts
+describe('fail', ({ test }) => {
+  test('should not reach here', ({ assert }) => {
+    assert.fail('unreachable')
   })
 })
 ```

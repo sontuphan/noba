@@ -4,11 +4,9 @@ on:
   push:
     branches:
       - master
-      - next
   pull_request:
     branches:
       - master
-      - next
 
 env:
   NODE_VERSION: 22

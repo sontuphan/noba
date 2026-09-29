@@ -1,5 +1,5 @@
 export default {
-  branches: ['master', { name: 'next', prerelease: true }],
+  branches: ['master'],
   plugins: [
     '@semantic-release/commit-analyzer',
     '@semantic-release/release-notes-generator',

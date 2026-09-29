@@ -4,21 +4,21 @@ Author: [@sontuphan](https://github.com/sontuphan) - Repo: [https://github.com/s
 
 #### Abstract
 
-_To support tests in both the Node and Bare Javascript runtimes, we have duplicated test cases written in two runners: Jest and Brittle. This hampers the development process and increases the surface area of dev and maintenance, as well as the changes of mistakes or missed test cases. Investigate the feasibility of consolidating these test runners, and build a POC of an isometric test framework that allows one-time definition of test cases that are runnable on both `npm test:node` and `npm test:bare`. Create a summary of findings and potential next steps in a report._
+_To support tests in both the Node and Bare Javascript runtimes, we have duplicated test cases written in two runners: Jest and Brittle. This hampers the development process and increases the surface area of dev and maintenance, as well as the chances of mistakes or missed test cases. Investigate the feasibility of consolidating these test runners, and build a POC of an isometric test framework that allows one-time definition of test cases that are runnable on both `npm test:node` and `npm test:bare`. Create a summary of findings and potential next steps in a report._
 
 By [@jonathunne](https://github.com/jonathunne)
 
 ## Introduction
 
-**Noba** is a runtime-agnostic testing framework designed to work consistently across Node.js, Deno, Bun, and Bare, while preserving the developer experience and conventions of Jest and Vitest. Noba is all about **"Write once, test everywhere"**.
+**Noba** is a runtime-agnostic testing framework designed to work consistently across JavaScript runtimes, while preserving the developer experience and conventions of Jest and Vitest. It currently ships runners for Node.js and Bare. Noba is all about **"Write once, test everywhere"**.
 
-Traditional JavaScript testing frameworks like Jest, Mocha, and Vitest are powerful, feature-rich, and deeply integrated into the Node.js ecosystem — but that’s also their greatest limitation. They are built with strong assumptions about how the runtime behaves, which makes them incompatible with alternative runtimes like Deno, Bun, or Bare.
+Traditional JavaScript testing frameworks like Jest, Mocha, and Vitest are powerful, feature-rich, and deeply integrated into the Node.js ecosystem, but that's also their greatest limitation. They are built with strong assumptions about how the runtime behaves, which makes them incompatible with alternative runtimes like Deno, Bun, or Bare.
 
-A **runtime abstraction layer** is the missing piece that Noba introduces. With the runtime abstraction layer, your tests are no logner tight coupling to the runtime standard library or dependent on runtime’s module loader and runtime internals.
+A **runtime abstraction layer** is the missing piece that Noba introduces. With the runtime abstraction layer, your tests are no longer tightly coupled to the runtime's standard library, module loader, or internals.
 
 ## DX Enhancement
 
-Today, maintaining compatibility of a project like WDK across different runtimes — for example, Node.js and Bare — comes with a heavy cost to developer experience (DX). Teams often have to duplicate the entire test suite into two separate frameworks:
+Today, maintaining compatibility of a project like WDK across different runtimes (for example, Node.js and Bare) comes with a heavy cost to developer experience (DX). Teams often have to duplicate the entire test suite into two separate frameworks:
 
 - Jest for Node.js
 - Brittle for Bare
@@ -164,13 +164,13 @@ noba-bare ./test/*.test.js  # Run the same tests in Bare
 By adopting Noba, teams gain several key benefits:
 
 - No more duplicated tests.
-- Improved tooling compatibility – dynamic import attributes are now recognized by tools like StandardJS and Prettier, reducing linting friction.
+- Improved tooling compatibility: dynamic import attributes are now recognized by tools like StandardJS and Prettier, reducing linting friction.
 
 ## Feature Enhancement
 
-Some test scripts written in Jest cannot be migrated to Brittle because of Brittle’s limited feature set. This restriction prevents teams from running comprehensive tests in Bare, forcing them to either rewrite tests with reduced coverage or skip certain scenarios altogether.
+Some test scripts written in Jest cannot be migrated to Brittle because of Brittle's limited feature set. This restriction prevents teams from running comprehensive tests in Bare, forcing them to either rewrite tests with reduced coverage or skip certain scenarios altogether.
 
-For example, mocking is an essential feature in Jest, heavily used in projects like wdk-wallet-spark and for hardware interaction testing. Mocking allows developers to isolate components, simulate dependencies, and verify behavior without relying on real implementations. However, this feature is not supported in Brittle, which means the team cannot execute the same test cases in Bare — leaving critical parts of the testing pipeline unverified.
+For example, mocking is an essential feature in Jest, heavily used in projects like wdk-wallet-spark and for hardware interaction testing. Mocking allows developers to isolate components, simulate dependencies, and verify behavior without relying on real implementations. However, this feature is not supported in Brittle, which means the team cannot execute the same test cases in Bare, leaving critical parts of the testing pipeline unverified.
 
 ```js
 // ./tests/wallet-account-read-only-spark.test.js
@@ -188,13 +188,13 @@ jest.unstable_mockModule('@sparkscan/api-node-sdk-client', () => ({
 }))
 ```
 
-Noba solves this problem by providing a rich feature set compatible with modern testing patterns — including advanced assertions, mocking, async utilities, and snapshot testing — enabling teams to achieve the same depth and quality of testing in Bare as they do in Node.js.
+Noba solves this problem by providing a rich feature set compatible with modern testing patterns, including advanced assertions, mocking, spying, and async utilities, enabling teams to achieve the same depth and quality of testing in Bare as they do in Node.js.
 
 | Feature / Capability               | **Jest / Vitest** | **Brittle**  | **Noba**      |
 | ---------------------------------- | ----------------- | ------------ | ------------- |
 | **Mock** support                   | ✅ Yes            | ❌ No        | ✅ Yes        |
 | **Spy** utilities                  | ✅ Yes            | ❌ No        | ✅ Yes        |
-| **Snapshot testing**               | ✅ Yes            | ❌ No        | 🔁 In-process |
+| **Snapshot testing**               | ✅ Yes            | ❌ No        | ❌ No         |
 | **Coverage reporters**             | ✅ Yes            | ⚠️ Limited   | ✅ Yes        |
 | **Typesafe**                       | ✅ Yes            | ⚠️ Limited   | ✅ Yes        |
 | Test syntax (describe/test/expect) | ✅ Familiar       | ❌ Different | ✅ Familiar   |
@@ -205,23 +205,23 @@ Noba solves this problem by providing a rich feature set compatible with modern 
 
 ### Early Stage Maturity
 
-Noba is a relatively new framework that hasn’t yet achieved the battle-tested stability of Jest or Vitest. Although it imitates Jest/Vitest syntax, its self-implementation can be risky and prone to bugs.
+Noba is a relatively new framework that hasn't yet achieved the battle-tested stability of Jest or Vitest. Although it imitates Jest/Vitest syntax, its self-implementation can be risky and prone to bugs.
 
 For example, both `expect` and `assert` are available in Noba, but their implementations are incomplete and lack comprehensiveness.
 
 ### Learning Curve and Migration Costs
 
-Noba’s syntax is similar to Jest/Vitest; however, there are slight differences that require learning and migration efforts.
+Noba's syntax is similar to Jest/Vitest; however, there are slight differences that require learning and migration efforts.
 
 Furthermore, for some advanced features like mocking, Noba introduces new patterns that may create additional training overhead, including the need for updated documentation and examples.
 
 ### Performance
 
-Currently, Noba doesn't support parallel testing.
+Currently, Noba doesn't support parallel testing: test files run one after another, each in its own process.
 
 ### Feature Parity Challenges
 
-Maintaining feature parity across runtimes is complex and an ongoing effort. For example, coverage reporting mechanisms vary by runtime, which can lead to inconsistent metrics. As a result, Noba currently limits coverage reporting to `c8`, which is only available in the `V8` engine. In other words, if your tests run in JSC, Noba’s coverage support is limited.
+Maintaining feature parity across runtimes is complex and an ongoing effort. For example, coverage reporting mechanisms vary by runtime, which can lead to inconsistent metrics. As a result, Noba currently limits coverage reporting to `c8`, which relies on the `V8` engine. In other words, if your tests run in JSC, Noba's coverage support is limited.
 
 ### Maintenance Burden
 
