@@ -38,6 +38,10 @@ NOBA_MAIN_ID=0 bare ./dist/tests/expect/be.test.js
 NOBA_MAIN_ID=0 node ./dist/tests/expect/be.test.js
 ```
 
+# Release
+
+Work happens on `develop`. To release, open a pull request from `develop` into `master`; CI runs the tests on the pull request, and merging it publishes a new version to npm through semantic-release. The version is derived from the commit messages ([Conventional Commits](https://www.conventionalcommits.org/)). There are no prerelease channels.
+
 # Wiki
 
 This wiki lives in [`wiki/`](/sontuphan/noba/tree/develop/wiki) and is published by the `Publish Wiki` workflow on every push to `develop` that touches it. Edit the files there, not on GitHub.
